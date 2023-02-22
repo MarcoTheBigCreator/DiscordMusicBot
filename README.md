@@ -20,7 +20,6 @@
 <p align="center">
 <img src="https://user-images.githubusercontent.com/86860760/220539038-a159bc06-9bd5-4447-a39c-ecab82c1413c.png" style="width: 60%;">
 <img src="https://user-images.githubusercontent.com/86860760/220539054-b0668e49-b4f2-4868-9e05-1511c3018d46.png" style="width: 52%;">
-<img src="https://user-images.githubusercontent.com/86860760/220539071-6c718e72-3f92-4a91-a4c1-836a7ac4a6ab.png" style="width: 32%;">
 </p>
 <p align="left">
 </p>

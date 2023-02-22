@@ -19,7 +19,9 @@
 <h2 align="center"> How does it look? </h2>
 <p align="center">
 <img src="https://user-images.githubusercontent.com/86860760/220539038-a159bc06-9bd5-4447-a39c-ecab82c1413c.png" style="width: 60%;">
-<img src="https://user-images.githubusercontent.com/86860760/220539054-b0668e49-b4f2-4868-9e05-1511c3018d46.png" style="width: 52%;">
+<img src="https://user-images.githubusercontent.com/86860760/220539054-b0668e49-b4f2-4868-9e05-1511c3018d46.png" style="width: 46%;">
+<img src="https://user-images.githubusercontent.com/86860760/220660246-e1aa7530-5e02-4eea-890a-5a799dae0034.png" style="width: 31%;">
+  
 </p>
 <p align="left">
 </p>

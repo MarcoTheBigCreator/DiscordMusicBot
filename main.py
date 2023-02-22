@@ -1,6 +1,4 @@
-"""
-DISCORD MUSIC BOT CRUMMY Version 1.0 (stable)
-"""
+"""DISCORD MUSIC BOT CRUMMY Version 1.0 (stable)"""
 
 # Importing libraries
 import discord

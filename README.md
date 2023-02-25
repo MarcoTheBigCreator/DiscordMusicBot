@@ -88,15 +88,23 @@
     <ol>
       <li><strong>Clone</strong> the repo</li>
       <pre>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</pre>
+      <br>
       <li><strong>Install</strong> the dependencies</li>
       <pre>pip install -r requirements.txt</pre>
+      <br>
       <li><strong>Open</strong> main.py in a code editor and <strong>insert</strong> your Bot's Token (the one you previously copied and saved)</li>
       <img src="https://user-images.githubusercontent.com/86860760/221344485-6e98f07b-924f-4b46-8d0c-212031d89eba.png">
+      <br>
+      <br>
       <li><strong>Run</strong> the program</li>
       <pre>python main.py</pre>
+      <br>
+      <li><strong>Write</strong> "-help" in the chat of the server where the bot is located to show all commands</li>
+      <br>
       <li><strong>Optional:</strong> you can make a shortcut of the main.py file and move it to the desktop to run it directly, as well as assign some icon to it.</li>
     </ol>
   </div>
+  <br>
   <div align="center">
     <h2>Report issues</h2>
     <p>I apologize for any errors you may be experiencing.</p>

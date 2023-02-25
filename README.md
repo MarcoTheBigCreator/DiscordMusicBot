@@ -80,6 +80,7 @@
     </ol>
   </div>
   <div align="left">
-    <h3>Step 2: Create an Application on Discord Developer Portal</h3>
+    <h3>Step 2: Install FFmpeg</h3>
+    <strong>Follow the steps of</strong><a href="https://youtu.be/5xgegeBL0kw"> How to install FFmpeg</a> to proceed to the final step (the video is not mine so I would ask you to leave your support for the creator with a like or a comment).
   </div>
 </div>

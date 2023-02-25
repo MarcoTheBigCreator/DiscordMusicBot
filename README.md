@@ -82,5 +82,14 @@
   <div align="left">
     <h3>Step 2: Install FFmpeg</h3>
     <strong>Follow the steps of</strong><a href="https://youtu.be/5xgegeBL0kw"> How to install FFmpeg</a> to proceed to the final step (the video is not mine so I would ask you to leave your support for the creator with a like or a comment).
+  </div>  
+  <div align="left">
+    <h3>Step 3: Install the Program</h3>
+    <ol>
+      <li>Clone the repo</li>
+      <pre>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</pre>
+      <li>Clone the repo</li>
+      <pre>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</pre>
+    </ol>
   </div>
 </div>

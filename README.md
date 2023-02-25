@@ -68,10 +68,10 @@
         <ol>
           <li>
             <strong>Select</strong> "Bot" in "Scopes" and <strong>scroll down and select</strong> "Administrator" in "Bot Permissions.
-            <img src="https://user-images.githubusercontent.com/86860760/221342221-0389a535-b722-4727-9fbc-6bb0a5ae30da.png">
-            <img src="https://user-images.githubusercontent.com/86860760/221342388-3dfab5f0-8a8f-4cc5-aa66-7ae07660b46b.png">
           </li>
         </ol>
+        <img src="https://user-images.githubusercontent.com/86860760/221342221-0389a535-b722-4727-9fbc-6bb0a5ae30da.png">
+        <img src="https://user-images.githubusercontent.com/86860760/221342388-3dfab5f0-8a8f-4cc5-aa66-7ae07660b46b.png">
       </li>
       <br>
       <li>

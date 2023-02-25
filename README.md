@@ -49,11 +49,11 @@
       </li>
       <br>
       <li>
-         <strong>Customize</strong> the bot icon and username.
+         <strong>Customize</strong> the bot icon and username and then:
          <ol>
-          <li><strong>click</strong> on "View Token" button.</li>
-          <li><strong>copy</strong> the token.</li>
-          <li><strong>save it</strong> to some file or blog notes (you can only view it once, so make sure you have successfully saved it before moving on to the next step).</li>
+          <li><strong>Click</strong> on "View Token" button.</li>
+          <li><strong>Copy</strong> the token.</li>
+          <li><strong>Save it</strong> to some file or blog notes (you can only view it once, so make sure you have successfully saved it before moving on to the next step).</li>
         </ol>
         <img src="https://user-images.githubusercontent.com/86860760/221341089-cc655ce9-fa36-4e64-85f9-5ba35765659f.png">
       </li>

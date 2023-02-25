@@ -49,16 +49,37 @@
       </li>
       <br>
       <li>
-         Customize the bot icon and username. Then, <strong>click</strong> on "View Token" button, <strong>copy the token</strong>, and <strong>save it!</strong> to some file or blog notes <strong>(you can only view it once, so make sure you have successfully saved it before moving on to the next step)</strong>.
+         <strong>Customize</strong> the bot icon and username.
+         <ol>
+          <li><strong>click</strong> on "View Token" button.</li>
+          <li><strong><strong>copy</strong> the token.</li>
+          <li><strong>save it</strong> to some file or blog notes (you can only view it once, so make sure you have successfully saved it before moving on to the next step).</li>
+        </ol>
         <img src="https://user-images.githubusercontent.com/86860760/221341089-cc655ce9-fa36-4e64-85f9-5ba35765659f.png">
       </li>
       <br>
       <li>
-        <strong>Click</strong> on "Add Bot" button and <strong>accept</strong>.
-        <img src="https://user-images.githubusercontent.com/86860760/221340657-04c46a2e-c5b8-4eb9-8b83-bc25be6ca796.png">
+        <strong>Scroll down</strong> to "Bot Permissions" and <strong>click</strong> on "Administrator" and <strong>save changes</strong> <strong>(You can set the necessary permissions if you do not want to give "Administrator")</strong>.
+        <img src="https://user-images.githubusercontent.com/86860760/221341382-dae43315-6e62-4db8-948f-71b0751b67bf.png">
       </li>
       <br>
+      <li>
+        <strong>Click</strong> on "OAuth2" settings and <strong>go to</strong> "URL Generator" option.
+        <ol>
+          <li>
+            <strong>Select</strong> "Bot" in "Scopes" and <strong>scroll down and select</strong> "Administrator" in "Bot Permissions.
+            <img src="https://user-images.githubusercontent.com/86860760/221342221-0389a535-b722-4727-9fbc-6bb0a5ae30da.png">
+            <img src="https://user-images.githubusercontent.com/86860760/221342388-3dfab5f0-8a8f-4cc5-aa66-7ae07660b46b.png">
+          </li>
+        </ol>
+      </li>
+      <br>
+
+      <br>
       ![app4](https://user-images.githubusercontent.com/86860760/221341089-cc655ce9-fa36-4e64-85f9-5ba35765659f.png)
+      ![app7](https://user-images.githubusercontent.com/86860760/221341382-dae43315-6e62-4db8-948f-71b0751b67bf.png)
+![app8](https://user-images.githubusercontent.com/86860760/221342221-0389a535-b722-4727-9fbc-6bb0a5ae30da.png)
+![app9](https://user-images.githubusercontent.com/86860760/221342388-3dfab5f0-8a8f-4cc5-aa66-7ae07660b46b.png)
 
     </ol>
   </div>

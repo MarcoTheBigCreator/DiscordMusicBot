@@ -33,8 +33,15 @@
   <div align="left">
     <h3>Create an Application on Discord Developer Portal</h3>
     <ol>
-      <li>Access to<a href="https://discord.com/developers/applications"> Discord Developer Portal</a> and make a new application</li>
-      <img src="https://user-images.githubusercontent.com/86860760/221338732-33510cba-77c4-4e9a-9ba2-1302fd6e95be.png">
+      <li>
+        Access to<a href="https://discord.com/developers/applications"> Discord Developer Portal</a> and make a new application
+        <img src="https://user-images.githubusercontent.com/86860760/221338732-33510cba-77c4-4e9a-9ba2-1302fd6e95be.png" style="width: 60%;">
+      </li> 
+      <br>
+      <li>
+        Modify the "General Information" as you wish. Then, go to "Bot" settings
+        <img src="https://user-images.githubusercontent.com/86860760/221339439-ed0f890c-02e4-46c4-8551-25375cac624b.png">
+      </li>
     </ol>
   </div>
 </div>

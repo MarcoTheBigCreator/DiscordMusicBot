@@ -31,7 +31,7 @@
   <br>
   <h2 align="center"> How to create yours? </h2>
   <div align="left">
-    <h3>Create an Application on Discord Developer Portal</h3>
+    <h3>Step 1: Create an Application on Discord Developer Portal</h3>
     <ol>
       <li>
         <strong>Access</strong> to<a href="https://discord.com/developers/applications"> Discord Developer Portal</a> and make a new application.
@@ -77,7 +77,9 @@
       <li>
         <strong>Paste</strong> the link in a new tab to invite your bot to the server of your choice.
       </li>
-      <br>
     </ol>
+  </div>
+  <div align="left">
+    <h3>Step 2: Create an Application on Discord Developer Portal</h3>
   </div>
 </div>

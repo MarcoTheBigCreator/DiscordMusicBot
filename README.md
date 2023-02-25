@@ -34,14 +34,32 @@
     <h3>Create an Application on Discord Developer Portal</h3>
     <ol>
       <li>
-        Access to<a href="https://discord.com/developers/applications"> Discord Developer Portal</a> and make a new application
-        <img src="https://user-images.githubusercontent.com/86860760/221338732-33510cba-77c4-4e9a-9ba2-1302fd6e95be.png" style="width: 60%;">
+        <strong>Access</strong> to<a href="https://discord.com/developers/applications"> Discord Developer Portal</a> and make a new application.
+        <img src="https://user-images.githubusercontent.com/86860760/221338732-33510cba-77c4-4e9a-9ba2-1302fd6e95be.png">
       </li> 
       <br>
       <li>
-        Modify the "General Information" as you wish. Then, go to "Bot" settings
+        <strong>Customize</strong> the "General Information" as you wish. Then, <strong>go</strong> to "Bot" settings.
         <img src="https://user-images.githubusercontent.com/86860760/221339439-ed0f890c-02e4-46c4-8551-25375cac624b.png">
       </li>
+      <br>
+       <li>
+        <strong>Click</strong> on "Add Bot" button and <strong>accept</strong>.
+        <img src="https://user-images.githubusercontent.com/86860760/221340657-04c46a2e-c5b8-4eb9-8b83-bc25be6ca796.png">
+      </li>
+      <br>
+      <li>
+         Customize the bot icon and username. Then, <strong>click</strong> on "View Token" button, <strong>copy the token</strong>, and <strong>save it!</strong> to some file or blog notes <strong>(you can only view it once, so make sure you have successfully saved it before moving on to the next step)</strong>.
+        <img src="https://user-images.githubusercontent.com/86860760/221341089-cc655ce9-fa36-4e64-85f9-5ba35765659f.png">
+      </li>
+      <br>
+      <li>
+        <strong>Click</strong> on "Add Bot" button and <strong>accept</strong>.
+        <img src="https://user-images.githubusercontent.com/86860760/221340657-04c46a2e-c5b8-4eb9-8b83-bc25be6ca796.png">
+      </li>
+      <br>
+      ![app4](https://user-images.githubusercontent.com/86860760/221341089-cc655ce9-fa36-4e64-85f9-5ba35765659f.png)
+
     </ol>
   </div>
 </div>

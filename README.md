@@ -25,8 +25,16 @@
   <img src="https://user-images.githubusercontent.com/86860760/220539038-a159bc06-9bd5-4447-a39c-ecab82c1413c.png" style="width: 60%;">
   <img src="https://user-images.githubusercontent.com/86860760/220539054-b0668e49-b4f2-4868-9e05-1511c3018d46.png" style="width: 46%;">
   <img src="https://user-images.githubusercontent.com/86860760/220660246-e1aa7530-5e02-4eea-890a-5a799dae0034.png" style="width: 31%;">
+  <br>
+</div>
+<div>
+  <br>
+  <h2 align="center"> How to create yours? </h2>
+  <div align="left">
+    <h3>Create an Application on Discord Developer Portal</h3>
+    <ol>
+      <li>Access to<a href="https://discord.com/developers/applications"> Discord Developer Portal</a> and make a new application</li>
+      <img src="https://user-images.githubusercontent.com/86860760/221338732-33510cba-77c4-4e9a-9ba2-1302fd6e95be.png">
+    </ol>
   </div>
-  
-</p>
-<p align="left">
-</p>
+</div>

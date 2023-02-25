@@ -92,7 +92,15 @@
       <pre>pip install -r requirements.txt</pre>
       <li><strong>Open</strong> main.py in a code editor and <strong>insert</strong> your Bot's Token (the one you previously copied and saved)</li>
       <img src="https://user-images.githubusercontent.com/86860760/221344485-6e98f07b-924f-4b46-8d0c-212031d89eba.png">
-
+      <li><strong>Run</strong> the program</li>
+      <pre>python main.py</pre>
+      <li><strong>Optional:</strong> you can make a shortcut of the main.py file and move it to the desktop to run it directly, as well as assign some icon to it.</li>
     </ol>
+  </div>
+  <div align="center">
+    <h2>Report issues</h2>
+    <p>I apologize for any errors you may be experiencing.</p>
+    <p>Please keep in mind that this was made just for fun, other functionalities could be added with collaborational work. However, if you encounter an error while attempting an exercise that should have answers, please <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/issues">open an issue</a> and we will work to resolve it as soon as possible.</p>
+<p>When reporting an issue, please make sure to include the URL for the exercise. Thank you for your patience.</p>
   </div>
 </div>

@@ -59,6 +59,11 @@
       </li>
       <br>
       <li>
+        <strong>Scroll down and enable these options</strong>.
+        <img src="https://user-images.githubusercontent.com/86860760/221393810-47983733-5351-4342-8dc1-d2c39b1e0107.png">
+      </li>
+      <br>
+      <li>
         <strong>Scroll down</strong> to "Bot Permissions" and <strong>click</strong> on "Administrator" and <strong>save changes</strong> <strong>(You can set the necessary permissions one by one if you do not want to give "Administrator")</strong>.
         <img src="https://user-images.githubusercontent.com/86860760/221341382-dae43315-6e62-4db8-948f-71b0751b67bf.png">
       </li>

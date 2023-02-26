@@ -97,7 +97,7 @@
       <li><strong>Install</strong> the dependencies.</li>
       <pre><code>pip install -r requirements.txt</code></pre>
       <br>
-      <li><strong>Open</strong> main.py in a code editor and <strong>insert</strong> your Bot's Token (the one you previously copied and saved).</li>
+      <li><strong>Open</strong> main.py <strong>(line 256)</strong> in a code editor and <strong>insert</strong> your Bot's Token (the one you previously copied and saved).</li>
       <img src="https://user-images.githubusercontent.com/86860760/221344485-6e98f07b-924f-4b46-8d0c-212031d89eba.png">
       <br>
       <br>

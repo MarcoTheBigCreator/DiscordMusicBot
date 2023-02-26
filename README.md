@@ -60,7 +60,7 @@
       <br>
       <li>
         <strong>Scroll down and enable these options</strong>.
-        <img src="https://user-images.githubusercontent.com/86860760/221393810-47983733-5351-4342-8dc1-d2c39b1e0107.png">
+        <img src="https://user-images.githubusercontent.com/86860760/221394463-ce9b9b09-1cb2-4af7-be3d-66ce08d04985.png">
       </li>
       <br>
       <li>

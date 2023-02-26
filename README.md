@@ -80,7 +80,7 @@
       </li>
       <br>
       <li>
-        <strong>Paste</strong> the link in a new tab to invite your bot to the server of your choice.
+        <strong>Copy</strong> and <strong>Paste</strong> the link in a new tab to invite your bot to the server of your choice.
       </li>
     </ol>
   </div>

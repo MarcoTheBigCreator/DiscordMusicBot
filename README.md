@@ -92,7 +92,7 @@
     <h3>Step 3: Install the Program</h3>
     <ol>
       <li><strong>Clone</strong> the repo.</li>
-      <pre>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</pre>
+      git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git
       <br>
       <li><strong>Install</strong> the dependencies.</li>
       <pre>pip install -r requirements.txt</pre>

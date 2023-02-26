@@ -59,7 +59,7 @@
       </li>
       <br>
       <li>
-        <strong>Scroll down and enable these options</strong>.
+        <strong>Scroll down</strong> and <strong>enable</strong> these options.
         <img src="https://user-images.githubusercontent.com/86860760/221394463-ce9b9b09-1cb2-4af7-be3d-66ce08d04985.png">
       </li>
       <br>

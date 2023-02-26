@@ -107,8 +107,8 @@
   <br>
   <div align="center">
     <h2>Report Issues</h2>
-    <p>I apologize for any errors you may be experiencing.</p>
-    <p>Please keep in mind that this was made just for fun, other functionalities could be added with collaborational work. However, if you encounter an error while attempting an exercise that should have answers, please <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/issues">open an issue</a> and we will work to resolve it as soon as possible.</p>
+    <p>We apologize for any errors you may be experiencing.</p>
+    <p>Please keep in mind that this was made just for fun, other functionalities could be added with collaborational work. However, if you encounter an error while attempting an exercise that should have answers, please <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/issues">open an issue</a> and we will work to resolve it as soon as possible</p>
 <p>When reporting an issue, please make sure to include the URL for the exercise. Thank you for your patience.</p>
   </div>
 </div>

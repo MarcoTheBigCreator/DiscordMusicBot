@@ -117,4 +117,3 @@
 <p>When reporting an issue, please make sure to include the URL for the exercise. Thank you for your patience.</p>
   </div>
 </div>
-

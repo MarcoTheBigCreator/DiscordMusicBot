@@ -62,11 +62,11 @@ def play_next():
         is_playing = True
 
         mqueue.pop(0)
-        m_url = mqueue[0][0]['source']
-
-        vc.play(discord.FFmpegPCMAudio(m_url, **FFMPEG_OPTIONS), after=lambda e: play_next())
-    else:
-        is_playing = False
+        if len(mqueue) > 0:
+            m_url = mqueue[0][0]['source']
+            vc.play(discord.FFmpegPCMAudio(m_url, **FFMPEG_OPTIONS), after=lambda e: play_next())
+        else:
+            is_playing = False
 
 
 # infinite loop checking for songs in the queue

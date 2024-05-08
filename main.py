@@ -12,9 +12,10 @@ is_playing = False
 # Queue
 mqueue = []
 # Options for the YoutubeDL
-YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': True}
+YDL_OPTIONS = {'format': 'm4a/bestaudio/best', 'noplaylist': True}
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
                   'options': '-vn'}
+
 # Voice channel
 vc = ""
 
@@ -91,7 +92,7 @@ async def play_music():
         is_playing = False
 
 
-# Music Commands
+#Music Commands
 # Play Command
 @bot.command(name='play', aliases=['p', 'PLAY', 'Play', 'P'],
              help='Add a song to the queue (Example: -play despacito)')

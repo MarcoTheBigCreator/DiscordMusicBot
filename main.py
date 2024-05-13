@@ -127,7 +127,7 @@ async def play(ctx, *args):
         vc = await ctx.author.voice.channel.connect()
     elif vc.channel != ctx.author.voice.channel:
         await vc.move_to(ctx.author.voice.channel)
-        await ctx.send("***Moved to your voice channel*** :ok_hand:")
+        await ctx.send("***Moving to your voice channel*** :ok_hand:")
 
     if is_playing:
         # Add the song to the queue
@@ -231,7 +231,7 @@ async def jump(ctx, index: int):
 async def playlist_loop(ctx):
     global is_looping_playlist
     is_looping_playlist = not is_looping_playlist
-    await ctx.send(f"*Playlist* {'***loop enabled***' if is_looping_playlist else '***loop disabled***'}")
+    await ctx.send(f"{'***loop enabled***' if is_looping_playlist else '***loop disabled***'}  :repeat: ")
 
 # Leave Command
 @bot.command(name='leave', aliases=['LEAVE', 'Leave'], help='Leaves the Voice Channel')

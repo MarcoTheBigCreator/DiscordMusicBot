@@ -1,11 +1,21 @@
-"""DISCORD MUSIC BOT CRUMMY Version 1.0 (stable)"""
+"""DISCORD MUSIC BOT CRUMMY Version 1.1 (stable)"""
 
 # Importing libraries
 import discord
 from discord import ClientException
 from discord.ext import commands, tasks
-import random
+
+from dotenv import load_dotenv
+
 from yt_dlp import YoutubeDL
+
+import os
+import random
+
+load_dotenv()
+
+# DISCORD API TOKEN FROM .ENV
+DISCORD_API_TOKEN = os.getenv("DISCORD_API_TOKEN")
 
 # Global variables
 is_playing = False
@@ -264,4 +274,4 @@ async def nowplaying(ctx):
 
 
 # bot run loging in with token
-bot.run('INSERT YOUR TOKEN HERE')
+bot.run(DISCORD_API_TOKEN)

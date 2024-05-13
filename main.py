@@ -107,6 +107,7 @@ async def play_music():
     else:
         is_playing = False
 
+
 # Music Commands
 # Play Command
 @bot.command(name='play', aliases=['p', 'PLAY', 'Play', 'P'],
@@ -150,6 +151,7 @@ async def play(ctx, *args):
             mqueue.append([song, ctx.author.voice.channel])
             await play_music()
     ctx.voice_client.resume()
+
 
 # Queue Command
 @bot.command(name='queue', aliases=['q', 'qiu', 'QUEUE', 'Queue', 'Q'], help='Shows the queue of songs')
@@ -225,6 +227,7 @@ async def jump(ctx, index: int):
             for i in range(1, (index - 1)):
                 mqueue.pop((index - 1) - i)
             vc.stop()
+
 
 # Loop Command (experimental)
 @bot.command(name='loop', aliases=['l', 'LOOP', 'Loop'], help='Toggle playlist loop')

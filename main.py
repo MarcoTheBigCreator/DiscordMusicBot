@@ -9,6 +9,8 @@ from yt_dlp import YoutubeDL
 
 # Global variables
 is_playing = False
+is_looping_playlist = False
+
 # Queue
 mqueue = []
 # Options for the YoutubeDL
@@ -58,10 +60,11 @@ def search_yt(item):
 
 # Play next song
 def play_next():
-    global is_playing, vc, mqueue
+    global is_playing, vc, mqueue, is_looping_playlist
+    if is_looping_playlist:
+        mqueue.append(mqueue[0])  # Agrega la misma canción nuevamente al final de la cola
     if len(mqueue) > 0:
         is_playing = True
-
         mqueue.pop(0)
         if len(mqueue) > 0:
             m_url = mqueue[0][0]['source']
@@ -203,6 +206,12 @@ async def jump(ctx, index: int):
                 mqueue.pop((index - 1) - i)
             vc.stop()
 
+
+@bot.command(name='loop', aliases=['l', 'LOOP', 'Loop'], help='Toggle playlist loop')
+async def playlist_loop(ctx):
+    global is_looping_playlist
+    is_looping_playlist = not is_looping_playlist
+    await ctx.send(f"*Playlist* {'***loop enabled***' if is_looping_playlist else '***loop disabled***'}")
 
 # Leave Command
 @bot.command(name='leave', aliases=['LEAVE', 'Leave'], help='Leaves the Voice Channel')

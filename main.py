@@ -17,6 +17,9 @@ load_dotenv()
 # DISCORD API TOKEN FROM .ENV
 DISCORD_API_TOKEN = os.getenv("DISCORD_API_TOKEN")
 
+if not DISCORD_API_TOKEN:
+    raise ValueError('No se encontró el token de Discord.')
+
 # Global variables
 is_playing = False
 is_looping_playlist = False

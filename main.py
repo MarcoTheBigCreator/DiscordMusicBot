@@ -216,13 +216,14 @@ async def playlist_loop(ctx):
 # Leave Command
 @bot.command(name='leave', aliases=['LEAVE', 'Leave'], help='Leaves the Voice Channel')
 async def leave(ctx):
-    global vc, is_playing, mqueue
+    global vc, is_playing, mqueue, is_looping_playlist
     if ctx.author.voice is None:
         await ctx.send("***Enter to the Voice Channel***   :weary:     ")
     else:
         # You can add more farewell messages
         farewell = ["***See ya guys***   👀"]
         is_playing = False
+        is_looping_playlist = False
         await ctx.voice_client.disconnect()
         await ctx.send(random.choice(farewell))
         mqueue = []

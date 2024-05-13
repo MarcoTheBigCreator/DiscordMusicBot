@@ -58,7 +58,7 @@ def search_yt(item):
     return {'source': info['url'], 'title': info['title']}
 
 
-# Play next song
+# Play next song (loop experimental)
 def play_next():
     global is_playing, vc, mqueue, is_looping_playlist
     if is_looping_playlist:
@@ -206,7 +206,7 @@ async def jump(ctx, index: int):
                 mqueue.pop((index - 1) - i)
             vc.stop()
 
-
+# Loop Command (experimental)
 @bot.command(name='loop', aliases=['l', 'LOOP', 'Loop'], help='Toggle playlist loop')
 async def playlist_loop(ctx):
     global is_looping_playlist

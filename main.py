@@ -32,7 +32,7 @@ FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconne
                   'options': '-vn'}
 
 # Voice channel
-vc = ""
+vc = None
 
 # Defining help command
 help_command = commands.DefaultHelpCommand(no_category='Commands')
@@ -107,11 +107,10 @@ async def play_music():
     else:
         is_playing = False
 
-
-#Music Commands
+# Music Commands
 # Play Command
 @bot.command(name='play', aliases=['p', 'PLAY', 'Play', 'P'],
-             help='Add a song to the queue (Example: -play despacito)')
+             help='Add a song to the queue (Example: -play dark necessities)')
 async def play(ctx, *args):
     global vc, mqueue
 
@@ -120,29 +119,37 @@ async def play(ctx, *args):
     greeting = ["***Hi guys***   🔥 😎"]
 
     if ctx.author.voice is None:
-        await ctx.send("***You're not on the Voice Channel***   :flushed:  ")
-    else:
-        if ctx.voice_client is None:
-            song = search_yt(query)
+        await ctx.send("***You're not in a Voice Channel***   :flushed:  ")
+        return
 
-            if isinstance(type(song), type(True)):
-                await ctx.send("***I could not find that song***   :pleading_face:")
-            else:
-                await ctx.send(random.choice(greeting))
-                mqueue.append([song, ctx.author.voice.channel])
-                await play_music()
-                retval = mqueue[0][0]['title']
-                await ctx.send('**Now playing:** *{}*'.format(retval))
+    # Connect to the user's voice channel
+    if vc is None or not vc.is_connected():
+        vc = await ctx.author.voice.channel.connect()
+    elif vc.channel != ctx.author.voice.channel:
+        await vc.move_to(ctx.author.voice.channel)
+        await ctx.send("***Moved to your voice channel*** :ok_hand:")
+
+    if is_playing:
+        # Add the song to the queue
+        ctx.voice_client.resume()        
+        song = search_yt(query)
+        if isinstance(type(song), type(True)):       
+            await ctx.send("***I could not find that song***   :pleading_face:")
         else:
-            song = search_yt(query)
-
-            if isinstance(type(song), type(True)):
-                await ctx.send("***I could not find that song***   :pleading_face:")
-            else:
-                await ctx.send('*{}* ***- Added to queue  :eject:  :notes:***'.format(song['title']))
-                mqueue.append([song, ctx.author.voice.channel])
-                await play_music()
-
+            mqueue.append([song, ctx.author.voice.channel])
+            await ctx.send('*{}* ***- Added to queue  :eject:  :notes:***'.format(song['title']))
+    else:
+        # Start playing the song
+        ctx.voice_client.resume()        
+        song = search_yt(query)
+        if isinstance(type(song), type(True)):
+            await ctx.send("***I could not find that song***   :pleading_face:")
+        else:
+            await ctx.send(random.choice(greeting))
+            await ctx.send('*{}* ***- Now playing  :eject:  :notes:***'.format(song['title']))
+            mqueue.append([song, ctx.author.voice.channel])
+            await play_music()
+    ctx.voice_client.resume()
 
 # Queue Command
 @bot.command(name='queue', aliases=['q', 'qiu', 'QUEUE', 'Queue', 'Q'], help='Shows the queue of songs')
@@ -231,7 +238,9 @@ async def playlist_loop(ctx):
 async def leave(ctx):
     global vc, is_playing, mqueue, is_looping_playlist
     if ctx.author.voice is None:
-        await ctx.send("***Enter to the Voice Channel***   :weary:     ")
+        await ctx.send("***You must enter to the Voice Channel***   :weary:     ")
+    elif ctx.voice_client is None:
+        await ctx.send("***The bot is not connected to a voice channel***   :confused:    ")
     else:
         # You can add more farewell messages
         farewell = ["***See ya guys***   👀"]
@@ -240,17 +249,21 @@ async def leave(ctx):
         await ctx.voice_client.disconnect()
         await ctx.send(random.choice(farewell))
         mqueue = []
-
+        vc = None
 
 # Pause Command
 @bot.command(name='pause', aliases=['pa', 'Pause', 'PAUSE'], help='Pause the song')
 async def pause(ctx):
     global vc, mqueue
     if ctx.author.voice is None:
-        await ctx.send("***Enter to the Voice Channel***   :weary:     ")
-    else:
+        await ctx.send("***You must enter to the Voice Channel***   :weary:     ")
+    elif ctx.voice_client is None:
+        await ctx.send("***The bot is not connected to a voice channel***   :confused:    ")
+    elif ctx.voice_client.is_playing():
         await ctx.send(":pause_button:")
-        await ctx.voice_client.pause()
+        ctx.voice_client.pause()
+    else:
+        await ctx.send("***There is no song playing to pause***   :thinking:    ")
 
 
 # Resume Command
@@ -259,9 +272,14 @@ async def resume(ctx):
     global vc, mqueue
     if ctx.author.voice is None:
         await ctx.send("***You must enter to the Voice Channel***   :sleepy:    ")
-    else:
+    elif ctx.voice_client is None:
+        await ctx.send("***The bot is not connected to a voice channel***   :confused:    ")
+    elif ctx.voice_client.is_paused():
         await ctx.send(":arrow_forward:")
-        await ctx.voice_client.resume()
+        ctx.voice_client.resume()
+    else:
+        await ctx.send("***The song is not paused***   :rolling_eyes:    ")
+        ctx.voice_client.resume()
 
 
 # Now Playing Command

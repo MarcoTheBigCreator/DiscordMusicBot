@@ -1,4 +1,4 @@
-"""DISCORD MUSIC BOT CRUMMY Version 1.1 (stable)"""
+"""DISCORD MUSIC BOT CRUMMY Version 1.3 (stable)"""
 
 # Importing libraries
 import asyncio
@@ -20,7 +20,7 @@ load_dotenv()
 DISCORD_API_TOKEN = os.getenv("DISCORD_API_TOKEN")
 
 if not DISCORD_API_TOKEN:
-    raise ValueError('No se encontró el token de Discord.')
+    raise ValueError("DISCORD_API_TOKEN is not set in .env file")
 
 # Global variables
 is_playing = False

@@ -1,6 +1,8 @@
 """DISCORD MUSIC BOT CRUMMY Version 1.1 (stable)"""
 
 # Importing libraries
+import asyncio
+
 import discord
 from discord import ClientException
 from discord.ext import commands, tasks
@@ -75,16 +77,22 @@ def search_yt(item):
 def play_next():
     global is_playing, vc, mqueue, is_looping_playlist
     if is_looping_playlist:
-        mqueue.append(mqueue[0])  # Agrega la misma canción nuevamente al final de la cola
+        mqueue.append(mqueue[0])  # Add the first song to the end of the queue
     if len(mqueue) > 0:
         is_playing = True
         mqueue.pop(0)
         if len(mqueue) > 0:
             m_url = mqueue[0][0]['source']
             vc.play(discord.FFmpegPCMAudio(m_url, **FFMPEG_OPTIONS), after=lambda e: play_next())
+            asyncio.run_coroutine_threadsafe(send_now_playing_message(mqueue[0][0]['title']), bot.loop)
         else:
             is_playing = False
 
+# Function to send now playing message
+async def send_now_playing_message(song_title):
+    global vc, mqueue
+    text_channel = mqueue[0][2]
+    await text_channel.send(f"**Now Playing:** *{song_title}* :track_next:")
 
 # infinite loop checking for songs in the queue
 async def play_music():
@@ -137,7 +145,7 @@ async def play(ctx, *args):
         if isinstance(type(song), type(True)):       
             await ctx.send("***I could not find that song***   :pleading_face:")
         else:
-            mqueue.append([song, ctx.author.voice.channel])
+            mqueue.append([song, ctx.author.voice.channel, ctx.channel])
             await ctx.send('*{}* ***- Added to queue  :eject:  :notes:***'.format(song['title']))
     else:
         # Start playing the song
@@ -148,7 +156,7 @@ async def play(ctx, *args):
         else:
             await ctx.send(random.choice(greeting))
             await ctx.send('*{}* ***- Now playing  :eject:  :notes:***'.format(song['title']))
-            mqueue.append([song, ctx.author.voice.channel])
+            mqueue.append([song, ctx.author.voice.channel, ctx.channel])
             await play_music()
     ctx.voice_client.resume()
 
@@ -179,7 +187,9 @@ async def skip(ctx):
     if ctx.author.voice is None:
         await ctx.send("***You must enter to the Voice Channel!***   :rolling_eyes:   ")
     else:
-        if vc != "" and vc:
+        if not mqueue:
+            await ctx.send("***The queue is empty!***   :no_entry_sign:")
+        elif vc != "" and vc:
             vc.stop()
             await ctx.send("***Song skipped***   :fast_forward: ")
             retval = mqueue[0][0]['title']

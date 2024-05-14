@@ -275,9 +275,11 @@ async def jump(ctx, index: int):
             return
         else:
             x = index - 1
-            np = mqueue[x][0]['title']
-            embed = discord.Embed(description=f"Jumped to {np}", color=discord.Color.green())
-            await ctx.send(embed=embed, delete_after=30)
+            
+            # Optional: Notify the user that the bot has jumped to the song
+            # np = mqueue[x][0]['title']
+            # embed = discord.Embed(description=f"Jumped to {np}", color=discord.Color.green())
+            # await ctx.send(embed=embed, delete_after=30)
             for i in range(1, (index - 1)):
                 mqueue.pop((index - 1) - i)
             vc.stop()
@@ -290,7 +292,7 @@ async def playlist_loop(ctx):
 
     is_looping_playlist = not is_looping_playlist
 
-    embed = discord.Embed(description=f"{'loop enabled' if is_looping_playlist else 'loop disabled'}",
+    embed = discord.Embed(description=f"{'loop **enabled**' if is_looping_playlist else 'loop **disabled**'}",
                           color=discord.Color.blue())
     await ctx.send(embed=embed, delete_after=60)
 

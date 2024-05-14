@@ -201,7 +201,7 @@ async def queue(ctx):
                     requester_mention = "Unknown"
                 
                 if i == 0 and ctx.voice_client.is_playing():
-                    embed.add_field(name=f"**Now Playing - ** {i + 1}. {item[0]['title']}", value=f"Requested by: {requester_mention}", inline=True)
+                    embed.add_field(name=f"**Now Playing - ** {i + 1}. {item[0]['title']}", value="", inline=True)
                 else:
                     embed.add_field(name=f"{i + 1}. {item[0]['title']}", value="", inline=True)
             if len(mqueue) > max_songs:

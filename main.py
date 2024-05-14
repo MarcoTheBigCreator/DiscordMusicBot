@@ -1,4 +1,4 @@
-"""DISCORD MUSIC BOT CRUMMY Version 2.0 (stable)"""
+"""DISCORD MUSIC BOT CRUMMY Version 1.5 (stable)"""
 
 # Importing libraries
 import asyncio

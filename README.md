@@ -137,6 +137,8 @@
       <br>
       <li><strong>Follow</strong> the steps of the next video for the Heroku deployment. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
       <p>*The token he mentions on the video is the one you saved previously.</p>
+      <p>*The files are already made (you can skip to minute 5:59).</p>
+      <p>*Can modify the runtime.txt with the latest Python version available.</p>
       <br>
       <li>In addition to the video steps it's necessary to <strong>install</strong> these two build packs.</li>
       <pre>

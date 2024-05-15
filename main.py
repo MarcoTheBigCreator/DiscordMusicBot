@@ -83,10 +83,16 @@ def play_next():
         mqueue.pop(0)
         if len(mqueue) > 0:
             m_url = mqueue[0][0]['source']
-            vc.play(discord.FFmpegPCMAudio(m_url, **FFMPEG_OPTIONS), after=lambda e: play_next())
-            asyncio.run_coroutine_threadsafe(send_now_playing_message(mqueue[0][0]['title']), bot.loop)
+            # Check if vc is connected before trying to play
+            if vc and vc.is_connected():
+                vc.play(discord.FFmpegPCMAudio(m_url, **FFMPEG_OPTIONS), after=lambda e: play_next())
+                asyncio.run_coroutine_threadsafe(send_now_playing_message(mqueue[0][0]['title']), bot.loop)
+            else:
+                is_playing = False
         else:
             is_playing = False
+    else:
+        is_playing = False
 
 
 # Function to send now playing message

@@ -59,7 +59,7 @@ async def status():
 @bot.command(name='ping', aliases=['PING'], help='Verifies the bot\'s latency')
 async def ping(ctx):
     embed = discord.Embed(title="Pong!   🏓", description=f'{round(bot.latency * 1000)} ms', color=discord.Color.red())
-    await ctx.send(embed=embed, delete_after=30)
+    await ctx.send(embed=embed, delete_after=60)
 
 
 # Search the title written by the user
@@ -73,7 +73,6 @@ def search_yt(item):
     return {'source': info['url'], 'title': info['title']}
 
 
-# Play next song (loop experimental)
 def play_next():
     global is_playing, vc, mqueue, is_looping_playlist
 
@@ -97,7 +96,7 @@ async def send_now_playing_message(song_title):
     text_channel = mqueue[0][2]
 
     embed = discord.Embed(title="Now Playing", description=f"{song_title}", color=discord.Color.light_gray())
-    await text_channel.send(embed=embed, delete_after=60)
+    await text_channel.send(embed=embed, delete_after=120)
 
 
 # infinite loop checking for songs in the queue
@@ -160,7 +159,7 @@ async def play(ctx, *args):
             embed.add_field(name="Song", value=song['title'], inline=False)
             embed.add_field(name="By", value=[author.mention], inline=False)
 
-            await ctx.send(embed=embed, delete_after=90)
+            await ctx.send(embed=embed, delete_after=120)
     else:
         # Start playing the song
         ctx.voice_client.resume()
@@ -175,7 +174,7 @@ async def play(ctx, *args):
             embed = discord.Embed(title="Now Playing", color=discord.Color.green())
             embed.add_field(name="Song", value=song['title'], inline=False)
             embed.add_field(name="By", value=[author.mention], inline=False)
-            await ctx.send(embed=embed, delete_after=60)
+            await ctx.send(embed=embed, delete_after=120)
 
             await play_music()
     ctx.voice_client.resume()
@@ -209,7 +208,7 @@ async def queue(ctx):
                 embed.set_footer(text=footer_text)
         else:
             embed.description = "Queue is empty"
-        await ctx.send(embed=embed, delete_after=15)
+        await ctx.send(embed=embed, delete_after=3600)
 
 
 # Skip Command
@@ -228,7 +227,7 @@ async def skip(ctx):
             vc.stop()
             retval = mqueue[0][0]['title']
             embed = discord.Embed(title="Song skipped", description=f"{retval}", color=discord.Color.green())
-            await ctx.send(embed=embed, delete_after=15)
+            await ctx.send(embed=embed, delete_after=120)
 
 
 # Remove Command
@@ -256,34 +255,49 @@ async def remove(ctx, index: int):
             retval = mqueue[x][0]['title']
             mqueue.pop(index - 1)
             embed = discord.Embed(description=f"Removed {retval}", color=discord.Color.dark_grey())
-            await ctx.send(embed=embed, delete_after=30)
+            await ctx.send(embed=embed, delete_after=120)
 
 
-# Jump Command
+# Jump Command (experimental improvement)
 @bot.command(name='jump', aliases=['j', 'Jump', 'JUMP', 'J'],
              help='Jumps to a song in the queue (Example: -jump 2)')
 async def jump(ctx, index: int):
-    global vc
+    global vc, mqueue
 
     if ctx.author.voice is None:
         embed = discord.Embed(description="You're not in a Voice Channel", color=discord.Color.red())
         await ctx.send(embed=embed, delete_after=15)
     else:
-        if (index - 1) == 0:
-            embed = discord.Embed(description="You can't jump an empty queue", color=discord.Color.red())
+        if len(mqueue) == 0:
+            embed = discord.Embed(description="The queue is empty", color=discord.Color.red())
             await ctx.send(embed=embed, delete_after=15)
             return
+        
+        if index <= 1 or index > len(mqueue):
+            embed = discord.Embed(description="Invalid index", color=discord.Color.red())
+            await ctx.send(embed=embed, delete_after=15)
+            return
+
+        # Songs to be moved to the end of the queue
+        if is_looping_playlist == False:
+            songs_to_move = mqueue[:index-1]
         else:
-            x = index - 1
-            
-            # Optional: Notify the user that the bot has jumped to the song
-            # np = mqueue[x][0]['title']
-            # embed = discord.Embed(description=f"Jumped to {np}", color=discord.Color.green())
-            # await ctx.send(embed=embed, delete_after=30)
-            for i in range(1, (index - 1)):
-                mqueue.pop((index - 1) - i)
+            songs_to_move = mqueue[:index-2]
+
+        # Remaining queue starts from the requested song
+        mqueue = mqueue[index-2:]
+
+        # Append the moved songs to the end of the queue
+        mqueue.extend(songs_to_move)
+
+        # Stop the current song
+        if vc.is_playing():
             vc.stop()
 
+        # Optional: Notify the user
+        # np = mqueue[1][0]['title']
+        # embed = discord.Embed(description=f"Jumped to {np}", color=discord.Color.green())
+        # await ctx.send(embed=embed, delete_after=30)
 
 # Loop Playlist Command (experimental)
 @bot.command(name='loop', aliases=['l', 'LOOP', 'Loop'], help='Loops the playlist (once to enable, twice to disable)')
@@ -294,7 +308,7 @@ async def playlist_loop(ctx):
 
     embed = discord.Embed(description=f"{'loop **enabled**' if is_looping_playlist else 'loop **disabled**'}",
                           color=discord.Color.blue())
-    await ctx.send(embed=embed, delete_after=60)
+    await ctx.send(embed=embed)
 
 
 # Leave Command
@@ -336,11 +350,13 @@ async def pause(ctx):
         ctx.voice_client.pause()
     else:
         embed = discord.Embed(description="There is no song playing to pause", color=discord.Color.red())
-        await ctx.send(embed=embed, delete_after=15)
+        await ctx.send(embed=embed)
 
 
 # Resume Command
-@bot.command(name='resume', aliases=['unpause', 're', 'un', 'Resume', 'Unpause', 'RESUME', 'UNPAUSE', 'RE'], help='Resume the song')
+@bot.command(name='resume', 
+             aliases=['unpause', 're', 'un', 'Resume', 'Unpause', 'RESUME', 'UNPAUSE', 'RE'], 
+             help='Resume the song')
 async def resume(ctx):
     global vc, mqueue
     if ctx.author.voice is None:
@@ -355,7 +371,7 @@ async def resume(ctx):
         ctx.voice_client.resume()
     else:
         embed = discord.Embed(description="The song is not paused", color=discord.Color.red())
-        await ctx.send(embed=embed, delete_after=15)
+        await ctx.send(embed=embed)
         ctx.voice_client.resume()
 
 
@@ -370,7 +386,7 @@ async def nowplaying(ctx):
     else:
         retval = mqueue[0][0]['title']
         embed = discord.Embed(title="Now Playing", description=f"{retval}", color=discord.Color.blue())
-        await ctx.send(embed=embed, delete_after=60)
+        await ctx.send(embed=embed, delete_after=120)
 
 
 # bot run logging in with token

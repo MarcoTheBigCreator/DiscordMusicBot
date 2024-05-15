@@ -101,6 +101,8 @@
       <li><strong>Clone</strong> the repo.</li>
       <pre><code>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</code></pre>
       <p>If Git is not installed. <strong>Download</strong> manually the repo.</p>
+      <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/4f4b1a12-002f-4738-9511-66258acaa11a">
+      <br>
       <br>
       <li><strong>Install</strong> the dependencies.</li>
       <pre><code>pip install -r requirements.txt</code></pre>
@@ -137,7 +139,7 @@
       <li><strong>Optional: Install</strong> the dependencies.</li>
       <pre><code>pip install -r requirements.txt</code></pre>
       <br>
-      <li><strong>Follow</strong> the steps of the next video for the Heroku deployment. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
+      <li><strong>Follow</strong> the steps of the <a href="https://youtu.be/nU2Egc3Zx3Q?si=0JEnBFNEuXjVf-j1">Heroku deployment video</a>. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
       <p>*The token he mentions on the video is the one you saved previously.</p>
       <p>*The files are already made (you can skip to minute 5:59).</p>
       <br>

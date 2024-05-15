@@ -1,6 +1,6 @@
 <div align="center">
   <img src="https://user-images.githubusercontent.com/86860760/220523513-b32c0c1d-c003-408a-9569-a0c1d7d81ec5.jpg">
-  <h1 align="center"> Discord Music Bot "Crummy" </h1>
+  <h1 align="center"> Discord Music Bot "Crummy" [New Version 2.0]</h1>
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/MarcoTheBigCreator/DiscordMusicBot?color=blueviolet&style=for-the-badge">
   <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/graphs/contributors">
     <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/MarcoTheBigCreator/DiscordMusicBot?color=gree&style=for-the-badge">
@@ -14,19 +14,18 @@
   <p align="center">
    An easy to use Discord Bot for playing music in Discord servers. Using <a href="https://www.python.org/">Python</a>, <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a> and <a href="https://ffmpeg.org/">FFmpeg</a>.
   </p>
-  <h2>New Version 2.0</h2>
-  <h3>Now Deployable on Heroku!</h3>
-  <br>
-  <br>
   <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/stargazers"><strong>Give to Crummy a Star!</strong></a>
+  <hr>
+  <h3>Now Deployable on Heroku!</h3>
+  <hr>
 </div>
 <div>
-  <br>
   <h2 align="center"> How does it look? </h2>
   <p align="center">
-  <img src="https://user-images.githubusercontent.com/86860760/220539038-a159bc06-9bd5-4447-a39c-ecab82c1413c.png" style="width: 60%;">
-  <img src="https://user-images.githubusercontent.com/86860760/220539054-b0668e49-b4f2-4868-9e05-1511c3018d46.png" style="width: 46%;">
-  <img src="https://user-images.githubusercontent.com/86860760/220660246-e1aa7530-5e02-4eea-890a-5a799dae0034.png" style="width: 31%;">
+  <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/b4647dcc-3503-4d82-9d52-55590956a92b" style="width: 40%;">
+  <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/ab4cb35d-3f90-45eb-adbc-51ce50650e91" style="width: 48%;">
+  <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/f22bea8b-0b9b-449c-8360-2a82b77351c5" style="width: 70%;">
+  <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/56480cb9-f4da-4d7d-923b-53748b665b36" style="width: 70%;">
   <br>
 </div>
 <div>
@@ -111,6 +110,7 @@
       <li><strong>Paste</strong> it <strong>changing</strong> the name to just <strong>.env</strong></li>
       <br>
       <li><strong>Put</strong> your Bot's Token (the one you previously copied and saved) on the <strong>.env</strong> file.</li>
+      <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/c6e4def1-d205-4435-9eb4-c62bf1659478">
       <br>
       <br>
       <li><strong>Run</strong> the program.</li>
@@ -130,7 +130,9 @@
     <ol>
       <li><strong>Clone</strong> the repo.</li>
       <pre><code>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</code></pre>
-      <p>If Git is not installed. <strong>Download</strong> manually the repo.</p>
+      <p>*If Git is not installed. <strong>Download</strong> manually the repo.</p>
+      <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/4f4b1a12-002f-4738-9511-66258acaa11a">
+      <br>
       <br>
       <li><strong>Optional: Install</strong> the dependencies.</li>
       <pre><code>pip install -r requirements.txt</code></pre>
@@ -139,15 +141,22 @@
       <p>*The token he mentions on the video is the one you saved previously.</p>
       <p>*The files are already made (you can skip to minute 5:59).</p>
       <br>
-      <li>In addition to the video steps it's necessary to <strong>install</strong> this build pack.</li>
+      <li>In addition to the video steps it's necessary to <strong>install</strong> this build pack (you can do it from the page direclty as image indicates).</li>
       <pre><code>https://github.com/heroku/heroku-buildpack-activestorage-preview.git</code></pre>
+      <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/c1a59078-d001-4654-bf01-d0d1e5064127">
+      <br>
+      <br>
     <p>*After this a new deployment will be necessary to add that build pack.</p>
     <li><strong>Modify</strong> the runtime.txt with the latest version of Python (in order to make a change to commit).</li>
+      <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/cd121a58-9213-47c5-8074-9d01d3831180">
+      <br>
+      <br>
     <li><strong>Commit</strong> the runtime.txt change.</li>
     <pre><code>git commit -m "update runtime version"</code></pre>
     <li><strong>Push</strong> the changes in order to start a new deployment.</li>
     <pre><code>git push heroku main</code></pre>
     <li><strong>Activate</strong> your Heroku app. </li>
+    <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/d82501df-45ca-4b6b-9212-9f95d143cb7a">
     </ol>
   </div>
   <br>

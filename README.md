@@ -137,7 +137,7 @@
       <li><strong>Optional: Install</strong> the dependencies.</li>
       <pre><code>pip install -r requirements.txt</code></pre>
       <br>
-      <li><strong>Follow</strong> the steps of the next video for the Heroku deployment. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
+      <li><strong>Follow</strong> the steps of the <a href="https://youtu.be/nU2Egc3Zx3Q?si=0JEnBFNEuXjVf-j1">Heroku deployment video</a>. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
       <p>*The token he mentions on the video is the one you saved previously.</p>
       <p>*The files are already made (you can skip to minute 5:59).</p>
       <br>

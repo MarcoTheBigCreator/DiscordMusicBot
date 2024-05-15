@@ -101,6 +101,8 @@
       <li><strong>Clone</strong> the repo.</li>
       <pre><code>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</code></pre>
       <p>If Git is not installed. <strong>Download</strong> manually the repo.</p>
+      <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/4f4b1a12-002f-4738-9511-66258acaa11a">
+      <br>
       <br>
       <li><strong>Install</strong> the dependencies.</li>
       <pre><code>pip install -r requirements.txt</code></pre>

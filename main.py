@@ -160,7 +160,7 @@ async def play(ctx, *args):
             embed.add_field(name="Song", value=song['title'], inline=False)
             embed.add_field(name="By", value=[author.mention], inline=False)
 
-            await ctx.send(embed=embed, delete_after=60)
+            await ctx.send(embed=embed, delete_after=90)
     else:
         # Start playing the song
         ctx.voice_client.resume()
@@ -182,7 +182,7 @@ async def play(ctx, *args):
 
 
 # Queue Command
-@bot.command(name='queue', aliases=['q', 'qiu', 'QUEUE', 'Queue', 'Q'], help='Shows the queue of songs')
+@bot.command(name='queue', aliases=['q', 'QUEUE', 'Queue', 'Q'], help='Shows the queue of songs')
 async def queue(ctx):
     global mqueue
 
@@ -285,8 +285,8 @@ async def jump(ctx, index: int):
             vc.stop()
 
 
-# Loop Command (experimental)
-@bot.command(name='loop', aliases=['l', 'LOOP', 'Loop'], help='Loops the current playlist')
+# Loop Playlist Command (experimental)
+@bot.command(name='loop', aliases=['l', 'LOOP', 'Loop'], help='Loops the playlist (once to enable, twice to disable)')
 async def playlist_loop(ctx):
     global is_looping_playlist
 
@@ -340,7 +340,7 @@ async def pause(ctx):
 
 
 # Resume Command
-@bot.command(name='resume', aliases=['unpause', 're', 'un'], help='Resume the song')
+@bot.command(name='resume', aliases=['unpause', 're', 'un', 'Resume', 'Unpause', 'RESUME', 'UNPAUSE', 'RE'], help='Resume the song')
 async def resume(ctx):
     global vc, mqueue
     if ctx.author.voice is None:

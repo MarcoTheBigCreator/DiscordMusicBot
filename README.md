@@ -14,6 +14,8 @@
   <p align="center">
    An easy to use Discord Bot for playing music in Discord servers. Using <a href="https://www.python.org/">Python</a>, <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a> and <a href="https://ffmpeg.org/">FFmpeg</a>.
   </p>
+  <h2>New Version 2.0</h2>
+  <h3>Now Deployable on Heroku!</h3>
   <br>
   <br>
   <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/stargazers"><strong>Give to Crummy a Star!</strong></a>
@@ -87,33 +89,164 @@
   <div align="left">
     <h3>Step 2: Install FFmpeg</h3>
     <strong>Follow the steps of</strong><a href="https://youtu.be/5xgegeBL0kw"> How to install FFmpeg</a> to proceed to the final step (the video is not mine so I would ask you to leave your support for the creator with a like or a comment).
-  </div>  
+  </div>
+  <br>
+  <div align="center">
+    <hr>
+    <h2>Steps for local use</h2>
+  </div>
   <div align="left">
-    <h3>Step 3: Install the Program</h3>
+    <h3>Step 3: Download and configure the Program</h3>
+    <strong>It is expected having Python and optionally Git installed already, If not click on</strong><a href="https://youtu.be/nU2Egc3Zx3Q?si=0JEnBFNEuXjVf-j1"> How to Install Python</a> and <a href="https://git-scm.com/downloads"> Git Download Page</a> to proceed with the process (the video is not mine so I would ask you to leave your support for the creator with a like or a comment).
     <ol>
       <li><strong>Clone</strong> the repo.</li>
       <pre><code>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</code></pre>
+      <p>If Git is not installed. <strong>Download</strong> manually the repo.</p>
       <br>
       <li><strong>Install</strong> the dependencies.</li>
       <pre><code>pip install -r requirements.txt</code></pre>
       <br>
-      <li><strong>Open</strong> main.py <strong>(line 256)</strong> in a code editor and <strong>insert</strong> your Bot's Token (the one you previously copied and saved).</li>
-      <img src="https://user-images.githubusercontent.com/86860760/221344485-6e98f07b-924f-4b46-8d0c-212031d89eba.png">
+      <li><strong>Open</strong> the repo in a code editor and <strong>copy</strong> the <strong>.env.template</strong> file.</li>
+      <br>
+      <li><strong>Paste</strong> it <strong>changing</strong> the name to just <strong>.env</strong></li>
+      <br>
+      <li><strong>Put</strong> your Bot's Token (the one you previously copied and saved) on the <strong>.env</strong> file.</li>
       <br>
       <br>
       <li><strong>Run</strong> the program.</li>
       <pre><code>python main.py</code></pre>
-      <br>
-      <li><strong>Write</strong> "-help" in the chat of the server where the bot is located to show all commands.</li>
       <br>
       <li><strong>Optional:</strong> you can make a shortcut of the main.py file and move it to the desktop to run it directly, as well as assign some icon to it.</li>
     </ol>
   </div>
   <br>
   <div align="center">
+    <hr>
+    <h2>Steps for Heroku deploying</h2>
+  </div>
+  <div align="left">
+    <h3>Step 3: Download and configure the deployment to Heroku</h3>
+    <strong>It is expected having Python and optionally Git installed already, If not click on</strong><a href="https://youtu.be/nU2Egc3Zx3Q?si=0JEnBFNEuXjVf-j1"> How to Install Python</a> and <a href="https://git-scm.com/downloads"> Git Download Page</a> to proceed with the process (the video is not mine so I would ask you to leave your support for the creator with a like or a comment).
+    <ol>
+      <li><strong>Clone</strong> the repo.</li>
+      <pre><code>git clone https://github.com/MarcoTheBigCreator/DiscordMusicBot.git</code></pre>
+      <p>If Git is not installed. <strong>Download</strong> manually the repo.</p>
+      <br>
+      <li><strong>Optional: Install</strong> the dependencies.</li>
+      <pre><code>pip install -r requirements.txt</code></pre>
+      <br>
+      <li><strong>Follow</strong> the steps of the next video for the Heroku deployment. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
+      <p>*The token he mentions on the video is the one you saved previously.</p>
+      <br>
+      <li>In addition to the video steps it's necessary to <strong>install</strong> these two build packs.</li>
+      <pre>
+        <code>https://github.com/heroku/heroku-buildpack-activestorage-preview.git</code>
+        <code>heroku/python</code>
+      </pre>
+    <li><strong>Deploy</strong> to deploy menu. </li>
+    <li><strong>Activate</strong> your Heroku app. </li>
+    </ol>
+  </div>
+  <br>
+  <hr>
+  <div align="center">
+    <h2>Commands</h2>
+  </div>
+  <div align="left">
+    <p>lol</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Commands</th>
+          <th>Aliases</th>
+          <th>Function</th>
+          <th>How to use it</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>help</td>
+          <td>[no aliases for default command]</td>
+          <td>Shows the help menu with all the commands</td>
+          <td>-help</td>
+        </tr>
+        <tr>
+          <td>jump</td>
+          <td>(j, Jump, JUMP, J)</td>
+          <td>Jump to a specific song in the queue</td>
+          <td>-jump [number]</td>
+        </tr>
+        <tr>
+          <td>leave</td>
+          <td>(LEAVE, Leave)</td>
+          <td>Bot leaves the voice channel</td>
+          <td>-leave</td>
+        </tr>
+        <tr>
+          <td>loop</td>
+          <td>(l, LOOP, Loop)</td>
+          <td>Loop the current playlist</td>
+          <td>-loop (activate, deactivate)</td>
+        </tr>
+        <tr>
+          <td>nowplaying</td>
+          <td>(np, Nowplaying, NP, NOWPLAYING)</td>
+          <td>Shows the current song playing</td>
+          <td>-nowplaying</td>
+        </tr>
+        <tr>
+          <td>pause</td>
+          <td>(pa, Pause, PAUSE)</td>
+          <td>Pause the current song</td>
+          <td>-pause</td>
+        </tr>
+        <tr>
+          <td>ping</td>
+          <td>PING</td>
+          <td>Shows the bots latency</td>
+          <td>-ping</td>
+        </tr>
+        <tr>
+          <td>play</td>
+          <td>(p, PLAY, Play, P)</td>
+          <td>Add a song to the queue</td>
+          <td>-play [song name]</td>
+        </tr>
+        <tr>
+          <td>queue</td>
+          <td>(q, QUEUE, Queue, Q)</td>
+          <td>Shows the queue</td>
+          <td>-queue</td>
+        </tr>
+        <tr>
+          <td>remove</td>
+          <td>(r, Remove, REMOVE, R)</td>
+          <td>Remove a song from the queue</td>
+          <td>-remove [number]</td>
+        </tr>
+        <tr>
+          <td>resume</td>
+          <td>(unpause, re, un, Resume, Unpause, RESUME, UNPAUSE, RE, UN)</td>
+          <td>Resume the current song</td>
+          <td>-resume</td>
+        </tr>
+        <tr>
+          <td>skip</td>
+          <td>(s, SKIP, Skip, S)</td>
+          <td>Skip the current song</td>
+          <td>-skip</td>
+        </tr>
+      </tbody>
+    </table>
+  <br>
+  <h3>How to create a command?</h3>
+  <p>sasasas images, etc</p>
+  </div>
+  <hr>
+  <div align="center">
     <h2>Report Issues</h2>
     <p>We apologize for any errors you may be experiencing.</p>
-    <p>Please keep in mind that this was made just for fun, other functionalities could be added with collaborational work. However, if you encounter an error while attempting an exercise that should have answers, please <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/issues">open an issue</a> and we will work to resolve it as soon as possible</p>
+    <p>Please keep in mind that this was made just for fun, other functionalities could be added with collaboration work. However, if you encounter an error while attempting an exercise that should have answers, please <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/issues">open an issue</a> and we will work to resolve it as soon as possible</p>
 <p>When reporting an issue, please make sure to include the URL for the exercise. Thank you for your patience.</p>
   </div>
 </div>

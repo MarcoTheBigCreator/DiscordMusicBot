@@ -138,14 +138,15 @@
       <li><strong>Follow</strong> the steps of the next video for the Heroku deployment. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
       <p>*The token he mentions on the video is the one you saved previously.</p>
       <p>*The files are already made (you can skip to minute 5:59).</p>
-      <p>*Can modify the runtime.txt with the latest Python version available.</p>
       <br>
-      <li>In addition to the video steps it's necessary to <strong>install</strong> these two build packs.</li>
-      <pre>
-        <code>https://github.com/heroku/heroku-buildpack-activestorage-preview.git</code>
-        <code>heroku/python</code>
-      </pre>
-    <li><strong>Deploy</strong> to deploy menu. </li>
+      <li>In addition to the video steps it's necessary to <strong>install</strong> this build pack.</li>
+      <pre><code>https://github.com/heroku/heroku-buildpack-activestorage-preview.git</code></pre>
+    <p>*After this a new deployment will be necessary to add that build pack.</p>
+    <li><strong>Modify</strong> the runtime.txt with the latest version of Python (in order to make a change to commit).</li>
+    <li><strong>Commit</strong> the runtime.txt change.</li>
+    <pre><code>git commit -m "update runtime version"</code></pre>
+    <li><strong>Push</strong> the changes in order to start a new deployment.</li>
+    <pre><code>git push heroku main</code></pre>
     <li><strong>Activate</strong> your Heroku app. </li>
     </ol>
   </div>
@@ -155,7 +156,7 @@
     <h2>Commands</h2>
   </div>
   <div align="left">
-    <p>lol</p>
+    <p>Below is a list of commands available for Crummy, along with their aliases and functions. Use these commands to control the music playback in your server.</p>
     <table>
       <thead>
         <tr>
@@ -241,8 +242,71 @@
       </tbody>
     </table>
   <br>
-  <h3>How to create a command?</h3>
-  <p>sasasas images, etc</p>
+<h3>Command Structure</h3>
+    <p>A command in a Discord bot is a function that executes a specific task when triggered by a user command. Here's what each part of a command does:</p>
+    <ul>
+        <li><strong>Decorator:</strong> This is where you define the command, its name, aliases, and a brief description of its functionality.</li>
+        <li><strong>Function:</strong> The main logic of the command, typically an asynchronous function (<code>async def</code>) that performs the desired task.</li>
+        <li><strong>Context (ctx):</strong> An object that contains information about the command invocation, such as the message, the author, the channel, etc.</li>
+        <li><strong>Embed:</strong> An embedded message is a rich content message that can include a title, description, color, fields, and other visual elements.</li>
+        <li><strong>Message Sending:</strong> The part where the bot sends the message, optionally deleting it after a specified time.</li>
+    </ul>
+    <h3>Ping Command Example</h3>
+    <pre><code>@bot.command(name='ping', aliases=['PING'], help='Verifies the bot\'s latency')
+async def ping(ctx):
+    # Create an embed with the bot's latency
+    embed = discord.Embed(
+        title="Pong!   🏓",
+        description=f'{round(bot.latency * 1000)} ms',
+        color=discord.Color.red()
+    )
+    # Send the embed to the channel and delete it after 30 seconds
+    await ctx.send(embed=embed, delete_after=30)
+    </code></pre>
+    <h3>Explanation</h3>
+    <ul>
+        <li><strong>Decorator:</strong>
+            <pre><code>@bot.command(name='ping', aliases=['PING'], help='Verifies the bot\'s latency')</code></pre>
+            <ul>
+                <li><code>name='ping'</code>: The name of the command.</li>
+                <li><code>aliases=['PING']</code>: Alternate names for the command.</li>
+                <li><code>help='Verifies the bot\'s latency'</code>: A brief description of what the command does, shown in the help menu.</li>
+            </ul>
+        </li>
+        <li><strong>Function:</strong>
+            <pre><code>async def ping(ctx):</code></pre>
+            <ul>
+                <li><code>async def</code>: Defines an asynchronous function.</li>
+                <li><code>ping(ctx)</code>: The function name and context parameter.</li>
+            </ul>
+        </li>
+        <li><strong>Embed:</strong>
+            <pre><code>embed = discord.Embed(
+    title="Pong!   🏓",
+    description=f'{round(bot.latency * 1000)} ms',
+    color=discord.Color.red()
+)</code></pre>
+            <ul>
+                <li><code>discord.Embed()</code>: Creates a new embed object.</li>
+                <li><code>title</code>: The title of the embed.</li>
+                <li><code>description</code>: The main content of the embed, here showing the bot's latency in milliseconds.</li>
+                <li><code>color</code>: The color of the embed's sidebar, here set to red.</li>
+            </ul>
+        </li>
+        <li><strong>Message Sending:</strong>
+            <pre><code>await ctx.send(embed=embed, delete_after=30)</code></pre>
+            <ul>
+                <li><code>ctx.send(embed=embed)</code>: Sends the embed to the channel.</li>
+                <li><code>delete_after=30</code>: Deletes the message after 30 seconds. This is optional and can be omitted if you don't want the message to be automatically deleted.</li>
+            </ul>
+        </li>
+    </ul>
+    <h3>Customization</h3>
+    <ul>
+        <li><strong>Embed Content:</strong> You can add more fields to the embed using <code>embed.add_field(name='Field Name', value='Field Value', inline=False)</code>.</li>
+        <li><strong>Embed Color:</strong> Change the color to match your bot's theme using <code>discord.Color.&lt;color_name&gt;()</code> or a hex code.</li>
+        <li><strong>Delete Time:</strong> Adjust or remove the <code>delete_after</code> parameter based on your needs.</li>
+    </ul>
   </div>
   <hr>
   <div align="center">

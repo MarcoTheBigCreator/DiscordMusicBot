@@ -261,7 +261,7 @@ async def remove(ctx, index: int):
             retval = mqueue[x][0]['title']
             mqueue.pop(index - 1)
             embed = discord.Embed(description=f"Removed {retval}", color=discord.Color.dark_grey())
-            await ctx.send(embed=embed, delete_after=120)
+            await ctx.send(embed=embed)
 
 
 # Jump Command (experimental improvement)
@@ -352,11 +352,11 @@ async def pause(ctx):
         await ctx.send(embed=embed, delete_after=15)
     elif ctx.voice_client.is_playing():
         embed = discord.Embed(description="Paused", color=discord.Color.blue())
-        await ctx.send(embed=embed, delete_after=60)
+        await ctx.send(embed=embed)
         ctx.voice_client.pause()
     else:
         embed = discord.Embed(description="There is no song playing to pause", color=discord.Color.red())
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, delete_after=15)
 
 
 # Resume Command
@@ -373,11 +373,11 @@ async def resume(ctx):
         await ctx.send(embed=embed, delete_after=15)
     elif ctx.voice_client.is_paused():
         embed = discord.Embed(description="Resumed", color=discord.Color.blue())
-        await ctx.send(embed=embed, delete_after=30)
+        await ctx.send(embed=embed)
         ctx.voice_client.resume()
     else:
         embed = discord.Embed(description="The song is not paused", color=discord.Color.red())
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, delete_after=15)
         ctx.voice_client.resume()
 
 

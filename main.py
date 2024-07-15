@@ -1,4 +1,4 @@
-"""DISCORD MUSIC BOT CRUMMY Version 2.0 (stable)"""
+"""DISCORD MUSIC BOT CRUMMY Version 2.1 (stable)"""
 
 # Importing libraries
 import asyncio
@@ -12,6 +12,10 @@ from dotenv import load_dotenv
 from yt_dlp import YoutubeDL
 
 import os
+import sys
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 load_dotenv()
 
@@ -64,13 +68,13 @@ async def ping(ctx):
 
 # Search the title written by the user
 def search_yt(item):
-    with YoutubeDL(YDL_OPTIONS) as ydl:
-        try:
+    try:
+        with YoutubeDL(YDL_OPTIONS) as ydl:
             info = ydl.extract_info("ytsearch:%s" % item, download=False)['entries'][0]
-        except Exception:
-            return False
-
-    return {'source': info['url'], 'title': info['title']}
+            return {'source': info['url'], 'title': info['title']}
+    except Exception as e:
+        print(f"Error in search_yt: {e}")
+        return None
 
 
 def play_next():
@@ -127,7 +131,6 @@ async def play_music():
     else:
         is_playing = False
 
-
 # Music Commands
 # Play Command
 @bot.command(name='play', aliases=['p', 'PLAY', 'Play', 'P'],
@@ -154,7 +157,7 @@ async def play(ctx, *args):
         # Add the song to the queue
         ctx.voice_client.resume()
         song = search_yt(query)
-        if isinstance(type(song), type(True)):
+        if song is None:
             embed = discord.Embed(description="I could not find that song", color=discord.Color.red())
             await ctx.send(embed=embed, delete_after=15)
         else:
@@ -170,7 +173,7 @@ async def play(ctx, *args):
         # Start playing the song
         ctx.voice_client.resume()
         song = search_yt(query)
-        if isinstance(type(song), type(True)):
+        if song is None:
             embed = discord.Embed(description="I could not find that song", color=discord.Color.red())
             await ctx.send(embed=embed, delete_after=15)
         else:

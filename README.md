@@ -104,8 +104,8 @@
       <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/4f4b1a12-002f-4738-9511-66258acaa11a">
       <br>
       <br>
-      <li><strong>Install</strong> the dependencies.</li>
-      <pre><code>pip install -r requirements.txt (make sure you're on the repo's folder to execute the command)</code></pre>
+      <li><strong>Install</strong> the dependencies (make sure you're on the repo's folder to execute the command).</li>
+      <pre><code>pip install -r requirements.txt</code></pre>
       <br>
       <li><strong>Open</strong> the repo in a code editor and <strong>copy</strong> the <strong>.env.template</strong> file.</li>
       <br>
@@ -136,8 +136,8 @@
       <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/4f4b1a12-002f-4738-9511-66258acaa11a">
       <br>
       <br>
-      <li><strong>Optional: Install</strong> the dependencies.</li>
-      <pre><code>pip install -r requirements.txt (make sure you're on the repo's folder to execute the command)</code></pre>
+      <li><strong>Optional: Install</strong> the dependencies (make sure you're on the repo's folder to execute the command).</li>
+      <pre><code>pip install -r requirements.txt</code></pre>
       <br>
       <li><strong>Follow</strong> the steps of the <a href="https://youtu.be/nU2Egc3Zx3Q?si=0JEnBFNEuXjVf-j1">Heroku deployment video</a>. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
       <p>*The token he mentions on the video is the one you saved previously.</p>

@@ -25,9 +25,15 @@ DISCORD_API_TOKEN = os.getenv("DISCORD_API_TOKEN")
 if not DISCORD_API_TOKEN:
     raise ValueError("DISCORD_API_TOKEN is not set in .env file")
 
+# PREFIX FROM .ENV
+PREFIX = os.getenv("DISCORD_BOT_PREFIX")
+if not PREFIX:
+    raise ValueError("DISCORD_BOT_PREFIX is not set in .env file")
+
 # Global variables
 is_playing = False
 is_looping_playlist = False
+current_prefix = PREFIX
 
 # Queue
 mqueue = []
@@ -42,8 +48,12 @@ vc = None
 # Defining help command
 help_command = commands.DefaultHelpCommand(no_category='Commands')
 
+# Function to get the prefix if changed
+def get_prefix(bot, message):
+    return current_prefix
+
 # Defining prefix of commands
-bot = commands.Bot(command_prefix='-', intents=discord.Intents.all(), help_command=help_command)
+bot = commands.Bot(command_prefix=get_prefix, intents=discord.Intents.all(), help_command=help_command)
 
 
 # When the bot is ready
@@ -397,6 +407,26 @@ async def nowplaying(ctx):
         embed = discord.Embed(title="Now Playing", description=f"{retval}", color=discord.Color.blue())
         await ctx.send(embed=embed, delete_after=120)
 
+# Change Prefix Command
+@bot.command(name='prefix', aliases=['pre', 'Prefix', 'PREFIX', 'Pre', 'PRE'], help='Change the prefix of the bot (Example: -prefix !)')
+async def changeprefix(ctx, new_prefix):
+    global current_prefix
+    current_prefix = new_prefix
+
+    # Read the .env file
+    with open('.env', 'r') as file:
+        data = file.readlines()
+
+    # Write the new prefix to the .env file
+    with open('.env', 'w') as file:
+        for line in data:
+            if line.startswith("DISCORD_BOT_PREFIX"):
+                file.write(f"DISCORD_BOT_PREFIX={new_prefix}\n")
+            else:
+                file.write(line)
+
+    embed  = discord.Embed(description=f"Prefix changed to: `{new_prefix}`", color=discord.Color.green())
+    await ctx.send(embed=embed, delete_after=90)
 
 # bot run logging in with token
 bot.run(DISCORD_API_TOKEN)

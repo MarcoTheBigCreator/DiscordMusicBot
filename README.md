@@ -28,6 +28,8 @@
   <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/56480cb9-f4da-4d7d-923b-53748b665b36" style="width: 70%;">
   <br>
 </div>
+
+<!-- Step 1: Discord App -->
 <div>
   <br>
   <h2 align="center"> How to create yours? </h2>
@@ -85,14 +87,15 @@
       </li>
     </ol>
   </div>
-  <div align="left">
-    <h3>Step 2: Install FFmpeg</h3>
-    <strong>Follow the steps of</strong><a href="https://youtu.be/5xgegeBL0kw"> How to install FFmpeg</a> to proceed to the final step (the video is not mine so I would ask you to leave your support for the creator with a like or a comment).
-  </div>
-  <br>
+
+  <!-- Local use -->
   <div align="center">
     <hr>
     <h2>Steps for local use</h2>
+  </div>
+    <div align="left">
+    <h3>Step 2: Install FFmpeg</h3>
+    <strong>Follow the steps of</strong><a href="https://youtu.be/5xgegeBL0kw"> How to install FFmpeg</a> to proceed to the final step (the video is not mine so I would ask you to leave your support for the creator with a like or a comment).
   </div>
   <div align="left">
     <h3>Step 3: Download and configure the Program</h3>
@@ -122,12 +125,14 @@
     </ol>
   </div>
   <br>
+
+  <!-- Heroku Deploying -->
   <div align="center">
     <hr>
     <h2>Steps for Heroku deploying</h2>
   </div>
   <div align="left">
-    <h3>Step 3: Download and configure the deployment to Heroku</h3>
+    <h3>Step 2: Download and configure the deployment to Heroku</h3>
     <strong>It is expected having Python and optionally Git installed already, If not click on</strong><a href="https://youtu.be/nU2Egc3Zx3Q?si=0JEnBFNEuXjVf-j1"> How to Install Python</a> and <a href="https://git-scm.com/downloads"> Git Download Page</a> to proceed with the process (the video is not mine so I would ask you to leave your support for the creator with a like or a comment).
     <ol>
       <li><strong>Clone</strong> the repo.</li>
@@ -135,9 +140,9 @@
       <p>*If Git is not installed. <strong>Download</strong> manually the repo.</p>
       <img src="https://github.com/MarcoTheBigCreator/DiscordMusicBot/assets/86860760/4f4b1a12-002f-4738-9511-66258acaa11a">
       <br>
-      <br>
+      <!-- <br>
       <li><strong>Optional: Install</strong> the dependencies (make sure you're on the repo's folder to execute the command).</li>
-      <pre><code>pip install -r requirements.txt</code></pre>
+      <pre><code>pip install -r requirements.txt</code></pre> -->
       <br>
       <li><strong>Follow</strong> the steps of the <a href="https://youtu.be/nU2Egc3Zx3Q?si=0JEnBFNEuXjVf-j1">Heroku deployment video</a>. (It's an excellent video for inexperience people, in case of previous experience deploying apps, can do it your own) <strong>Don't forget the support for the video's creator</strong>.</li>
       <p>*The token he mentions on the video is the one you saved previously.</p>
@@ -163,6 +168,8 @@
   </div>
   <br>
   <hr>
+
+  <!-- Commands Documentation -->
   <div align="center">
     <h2>Commands</h2>
   </div>
@@ -249,6 +256,12 @@
           <td>(s, SKIP, Skip, S)</td>
           <td>Skip the current song</td>
           <td>-skip</td>
+        </tr>
+        <tr>
+          <td>prefix</td>
+          <td>(pre, PRE, Pre, PREFIX, Prefix)</td>
+          <td>Change the bot's prefix</td>
+          <td>-prefix [new prefix]</td>
         </tr>
       </tbody>
     </table>

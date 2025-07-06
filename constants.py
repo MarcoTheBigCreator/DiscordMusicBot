@@ -6,32 +6,32 @@ Constants and configuration for the Discord Music Bot
 HELP_CATEGORIES = {
     "overview": {
         "title": "Music Bot Help",
-        "description": "Navigate through different command categories using the buttons below.",
+        "description": "Navigate through different command categories using the buttons below.\n ",
         "icon": "🏠"
     },
     "music": {
         "title": "Music Commands",
-        "description": "Core music playback and control commands",
+        "description": "Core music playback and control commands.\n ",
         "icon": "🎵"
     },
     "queue": {
         "title": "Queue Management",
-        "description": "Commands to manage your music queue",
+        "description": "Commands to manage your music queue.\n ",
         "icon": "📋"
     },
     "loop": {
         "title": "Loop & Shuffle",
-        "description": "Control playback modes and queue arrangement",
+        "description": "Control playback modes and queue arrangement.\n ",
         "icon": "🔄"
     },
     "info": {
         "title": "Information",
-        "description": "Get information about the bot and music",
+        "description": "Get information about the bot and music.\n ",
         "icon": "📊"
     },
     "admin": {
         "title": "Admin Commands",
-        "description": "Administrative and configuration commands",
+        "description": "Administrative and configuration commands.\n ",
         "icon": "⚙️"
     }
 }
@@ -49,7 +49,7 @@ COMMAND_CATEGORIES = {
     "queue": [
         ("queue", "q", "Show queue with pagination", "queue 2"),
         ("clear", "c", "Clear entire queue", "clear"),
-        ("shuffle", "sh", "Shuffle queue", "shuffle"),
+        ("shuffle", "sh", "Shuffle entire queue", "shuffle"),
         ("remove", "r", "Remove specific song", "remove 3"),
         ("move", "mv", "Move song position", "move 3 1"),
         ("jump", "j", "Jump to specific song", "jump 5")
@@ -117,6 +117,7 @@ MESSAGES = {
     # Playlist messages
     "playlist_loading": "🎵 Loading playlist...",
     "playlist_added": "📋 Added {} songs from playlist",
+    "playlist_queued": "📋 Queued {} songs from playlist",
     "playlist_title": "Playlist: {}",
     "playlist_partial": "⚠️ Loaded {} of {} songs (some may be unavailable)",
     "playlist_limit": "📋 Playlist limited to {} songs (max allowed)",

@@ -69,12 +69,23 @@ class MusicCommands(commands.Cog):
                     song_entry = [entry, ctx.author.voice.channel,
                                   ctx.channel, ctx.author]
                     self.music_bot.queue.append(song_entry)
+                    # Check if something is currently playing before adding playlist
                     added_count += 1
+            is_currently_playing = (
+                self.music_bot.is_playing and
+                self.music_bot.voice_client and
+                self.music_bot.voice_client.is_playing()
+            )
 
             # Send detailed confirmation with preview
             if added_count > 0:
-                embed = self.music_bot.create_success_embed(
-                    "playlist_added", added_count)
+                if is_currently_playing:
+                    embed = self.music_bot.create_success_embed(
+                        "playlist_queued", added_count)
+                else:
+                    embed = self.music_bot.create_success_embed(
+                        "playlist_added", added_count)
+
                 embed.add_field(name=MESSAGES["playlist_title"].format(playlist_title),
                                 value=f"📋 **{added_count}** songs added to queue", inline=False)
                 embed.add_field(name=MESSAGES["by_field"],
@@ -96,8 +107,8 @@ class MusicCommands(commands.Cog):
 
                 await ctx.send(embed=embed)
 
-                # Start playing if not already playing
-                if not self.music_bot.is_playing:
+                # Only start playing if nothing is currently playing
+                if not is_currently_playing:
                     await self.music_bot.start_playing()
             else:
                 embed = self.music_bot.create_error_embed("song_not_found")
@@ -110,7 +121,13 @@ class MusicCommands(commands.Cog):
                           ctx.channel, ctx.author]
             self.music_bot.queue.append(song_entry)
 
-            if self.music_bot.is_playing:
+            is_currently_playing = (
+                self.music_bot.is_playing and
+                self.music_bot.voice_client and
+                self.music_bot.voice_client.is_playing()
+            )
+
+            if is_currently_playing:
                 embed = self.music_bot.create_success_embed("queued")
                 embed.add_field(name=MESSAGES["song_field"],
                                 value=result['title'], inline=False)
@@ -246,10 +263,14 @@ class MusicCommands(commands.Cog):
 
         queue_length = len(self.music_bot.queue)
 
+        # Stop current playback
         if self.music_bot.voice_client and self.music_bot.voice_client.is_playing():
             self.music_bot.voice_client.stop()
 
-        self.music_bot.reset_state()
+        # Clear queue and reset playing state, but keep voice connection
+        self.music_bot.queue = []
+        self.music_bot.is_playing = False
+        # Keep loop_mode and voice_client intact
 
         embed = self.music_bot.create_success_embed(
             "queue_cleared", queue_length)
@@ -283,6 +304,7 @@ class MusicCommands(commands.Cog):
 
     @commands.command(name='shuffle', aliases=['sh', 'Shuffle', 'SHUFFLE', 'SH'])
     async def shuffle_queue(self, ctx):
+        """Shuffle the entire queue including the current song"""
         if not self.music_bot.is_user_in_voice(ctx):
             await self.music_bot.send_voice_error(ctx)
             return
@@ -293,15 +315,28 @@ class MusicCommands(commands.Cog):
             await ctx.send(embed=embed, delete_after=15)
             return
 
-        current_song = self.music_bot.queue[0]
-        remaining_songs = self.music_bot.queue[1:]
+        # Stop current song if playing
+        if (self.music_bot.voice_client and
+                self.music_bot.voice_client.is_playing()):
+            self.music_bot.voice_client.stop()
 
-        random.shuffle(remaining_songs)
-        self.music_bot.queue = [current_song] + remaining_songs
+        # Shuffle everything
+        all_songs = self.music_bot.queue.copy()
+        random.shuffle(all_songs)
+        self.music_bot.queue = all_songs
 
         embed = self.music_bot.create_success_embed(
-            "queue_shuffled", len(remaining_songs))
+            "queue_shuffled", len(all_songs))
+        embed.add_field(
+            name="🔀 Queue Shuffled",
+            value=f"Everything shuffled! Now playing: {all_songs[0][0]['title']}",
+            inline=False
+        )
         await ctx.send(embed=embed)
+
+        # Start playing the new first song
+        if not self.music_bot.is_playing:
+            await self.music_bot.start_playing()
 
     @commands.command(name='remove', aliases=['r', 'Remove', 'REMOVE', 'R'])
     async def remove(self, ctx, index: int):

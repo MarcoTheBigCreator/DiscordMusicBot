@@ -290,6 +290,7 @@ class MusicBot:
         try:
             if self.voice_client is None or not self.voice_client.is_connected():
                 self.voice_client = await ctx.author.voice.channel.connect()
+                await asyncio.sleep(0.5)
             elif self.voice_client.channel != ctx.author.voice.channel:
                 await self.voice_client.move_to(ctx.author.voice.channel)
                 embed = discord.Embed(
@@ -297,6 +298,7 @@ class MusicBot:
                     color=discord.Color.blue()
                 )
                 await ctx.send(embed=embed, delete_after=15)
+                await asyncio.sleep(0.3)
             return True
         except Exception as e:
             print(f"Error connecting to voice: {e}")
@@ -360,6 +362,12 @@ class MusicBot:
         )
         await text_channel.send(embed=embed, delete_after=120)
 
+    def play_next_song_callback(self, error):
+        """Callback wrapper for play_next_song that handles errors"""
+        if error:
+            print(f"Audio playback error: {error}")
+        self.play_next_song()
+
     def play_next_song(self):
         """Handle playing the next song based on loop mode"""
         if not self.queue:
@@ -388,7 +396,7 @@ class MusicBot:
                     audio_source = discord.FFmpegPCMAudio(
                         song_url, **self.ffmpeg_options)
                     self.voice_client.play(
-                        audio_source, after=lambda e: self.play_next_song())
+                        audio_source, after=lambda e: self.play_next_song_callback(e))
                     # Schedule now playing message using run_coroutine_threadsafe
                     asyncio.run_coroutine_threadsafe(
                         self.send_now_playing(self.queue[0][0]['title']),
@@ -408,29 +416,33 @@ class MusicBot:
             self.is_playing = False
             return
 
+        # Ensure we have a voice connection
+        if not self.voice_client or not self.voice_client.is_connected():
+            print("Error: No voice connection available when trying to start playing")
+            self.is_playing = False
+            return
+
         self.is_playing = True
         song_url = self.queue[0][0]['source']
 
         try:
-            if not self.voice_client or not self.voice_client.is_connected():
-                self.voice_client = await self.queue[0][1].connect()
-            else:
-                if self.voice_client.channel != self.queue[0][1]:
-                    await self.voice_client.move_to(self.queue[0][1])
-
+            # Stop any current playback
             if self.voice_client.is_playing():
                 self.voice_client.stop()
 
+            await asyncio.sleep(0.5)
+
             audio_source = discord.FFmpegPCMAudio(
                 song_url, **self.ffmpeg_options)
+
             self.voice_client.play(
-                audio_source, after=lambda e: self.play_next_song())
+                audio_source, after=lambda e: self.play_next_song_callback(e))
 
             # Send now playing message immediately
             await self.send_now_playing(self.queue[0][0]['title'])
 
         except ClientException as e:
-            print(f"Ignoring client exception: {e}")
+            print(f"ClientException in start_playing: {e}")
         except Exception as e:
             print(f"Error starting playback: {e}")
             self.is_playing = False

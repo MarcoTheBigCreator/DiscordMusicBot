@@ -1,6 +1,8 @@
+# Discord Music Bot CRUMMY v3.0 (Refactored)
+
 <div align="center">
   <img src="https://user-images.githubusercontent.com/86860760/220523513-b32c0c1d-c003-408a-9569-a0c1d7d81ec5.jpg">
-  <h1 align="center"> Discord Music Bot "Crummy" [New Version 2.0]</h1>
+  <h1 align="center"> Discord Music Bot "Crummy" [New Version 3.0 - Refactored]</h1>
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/MarcoTheBigCreator/DiscordMusicBot?color=blueviolet&style=for-the-badge">
   <a href="https://github.com/MarcoTheBigCreator/DiscordMusicBot/graphs/contributors">
     <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/MarcoTheBigCreator/DiscordMusicBot?color=gree&style=for-the-badge">
@@ -19,6 +21,7 @@
   <h3>Now Deployable on Heroku!</h3>
   <hr>
 </div>
+
 <div>
   <h2 align="center"> How does it look? </h2>
   <p align="center">
@@ -174,7 +177,125 @@
     <h2>Commands</h2>
   </div>
   <div align="left">
-    <p>Below is a list of commands available for Crummy, along with their aliases and functions. Use these commands to control the music playback in your server.</p>
+    <p>Below is a list of commands available for Crummy v3.0 (Refactored), along with their aliases and functions. Use these commands to control the music playback in your server.</p>
+    <h3>🎵 Core Music Commands</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Commands</th>
+          <th>Aliases</th>
+          <th>Function</th>
+          <th>How to use it</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>play</td>
+          <td>(p, PLAY, Play, P)</td>
+          <td>Add song to queue (supports URLs and search)</td>
+          <td>-play never gonna give you up</td>
+        </tr>
+        <tr>
+          <td>skip</td>
+          <td>(s, SKIP, Skip, S)</td>
+          <td>Skip current song</td>
+          <td>-skip</td>
+        </tr>
+        <tr>
+          <td>pause</td>
+          <td>(pa, Pause, PAUSE)</td>
+          <td>Pause playback</td>
+          <td>-pause</td>
+        </tr>
+        <tr>
+          <td>resume</td>
+          <td>(unpause, re, un, Resume, Unpause, RESUME, UNPAUSE, RE)</td>
+          <td>Resume playback</td>
+          <td>-resume</td>
+        </tr>
+        <tr>
+          <td>nowplaying</td>
+          <td>(np, Nowplaying, NP, NOWPLAYING)</td>
+          <td>Show current song</td>
+          <td>-nowplaying</td>
+        </tr>
+        <tr>
+          <td>leave</td>
+          <td>(LEAVE, Leave)</td>
+          <td>Disconnect from voice channel</td>
+          <td>-leave</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>📋 Queue Management Commands</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Commands</th>
+          <th>Aliases</th>
+          <th>Function</th>
+          <th>How to use it</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>queue</td>
+          <td>(q, QUEUE, Queue, Q)</td>
+          <td>Show current queue with pagination</td>
+          <td>-queue 2</td>
+        </tr>
+        <tr>
+          <td>clear</td>
+          <td>(c, Clear, CLEAR, C)</td>
+          <td>Clear entire queue</td>
+          <td>-clear</td>
+        </tr>
+        <tr>
+          <td>shuffle</td>
+          <td>(sh, Shuffle, SHUFFLE, SH)</td>
+          <td>Shuffle queue</td>
+          <td>-shuffle</td>
+        </tr>
+        <tr>
+          <td>remove</td>
+          <td>(r, Remove, REMOVE, R)</td>
+          <td>Remove specific song from queue</td>
+          <td>-remove 3</td>
+        </tr>
+        <tr>
+          <td>move</td>
+          <td>(mv, Move, MOVE, MV)</td>
+          <td>Move song position in queue</td>
+          <td>-move 3 1</td>
+        </tr>
+        <tr>
+          <td>jump</td>
+          <td>(j, Jump, JUMP, J)</td>
+          <td>Jump to specific song in queue</td>
+          <td>-jump 5</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>🔄 Loop System Commands</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Commands</th>
+          <th>Aliases</th>
+          <th>Function</th>
+          <th>How to use it</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>loop</td>
+          <td>(l, LOOP, Loop)</td>
+          <td>Cycle through loop modes (Off ▶️ / Song 🔂 / Queue 🔁)</td>
+          <td>-loop</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>📊 Information Commands</h3>
     <table>
       <thead>
         <tr>
@@ -187,85 +308,45 @@
       <tbody>
         <tr>
           <td>help</td>
-          <td>[no aliases for default command]</td>
-          <td>Shows the help menu with all the commands</td>
+          <td>(h, Help, HELP, H)</td>
+          <td>Interactive help with categorized commands</td>
           <td>-help</td>
         </tr>
         <tr>
-          <td>jump</td>
-          <td>(j, Jump, JUMP, J)</td>
-          <td>Jump to a specific song in the queue</td>
-          <td>-jump [number]</td>
-        </tr>
-        <tr>
-          <td>leave</td>
-          <td>(LEAVE, Leave)</td>
-          <td>Bot leaves the voice channel</td>
-          <td>-leave</td>
-        </tr>
-        <tr>
-          <td>loop</td>
-          <td>(l, LOOP, Loop)</td>
-          <td>Loop the current playlist</td>
-          <td>-loop (activate, deactivate)</td>
-        </tr>
-        <tr>
-          <td>nowplaying</td>
-          <td>(np, Nowplaying, NP, NOWPLAYING)</td>
-          <td>Shows the current song playing</td>
-          <td>-nowplaying</td>
-        </tr>
-        <tr>
-          <td>pause</td>
-          <td>(pa, Pause, PAUSE)</td>
-          <td>Pause the current song</td>
-          <td>-pause</td>
+          <td>status</td>
+          <td>(info, Status, STATUS, INFO)</td>
+          <td>Show bot status</td>
+          <td>-status</td>
         </tr>
         <tr>
           <td>ping</td>
-          <td>PING</td>
-          <td>Shows the bots latency</td>
+          <td>(PING)</td>
+          <td>Check bot latency</td>
           <td>-ping</td>
-        </tr>
-        <tr>
-          <td>play</td>
-          <td>(p, PLAY, Play, P)</td>
-          <td>Add a song to the queue</td>
-          <td>-play [song name]</td>
-        </tr>
-        <tr>
-          <td>queue</td>
-          <td>(q, QUEUE, Queue, Q)</td>
-          <td>Shows the queue</td>
-          <td>-queue</td>
-        </tr>
-        <tr>
-          <td>remove</td>
-          <td>(r, Remove, REMOVE, R)</td>
-          <td>Remove a song from the queue</td>
-          <td>-remove [number]</td>
-        </tr>
-        <tr>
-          <td>resume</td>
-          <td>(unpause, re, un, Resume, Unpause, RESUME, UNPAUSE, RE, UN)</td>
-          <td>Resume the current song</td>
-          <td>-resume</td>
-        </tr>
-        <tr>
-          <td>skip</td>
-          <td>(s, SKIP, Skip, S)</td>
-          <td>Skip the current song</td>
-          <td>-skip</td>
-        </tr>
-        <tr>
-          <td>prefix</td>
-          <td>(pre, PRE, Pre, PREFIX, Prefix)</td>
-          <td>Change the bot's prefix</td>
-          <td>-prefix [new prefix]</td>
         </tr>
       </tbody>
     </table>
-  <br>
+    <h3>⚙️ Admin Commands</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Commands</th>
+          <th>Aliases</th>
+          <th>Function</th>
+          <th>How to use it</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>prefix</td>
+          <td>(pre, PRE, Pre, PREFIX, Prefix)</td>
+          <td>Change bot prefix</td>
+          <td>-prefix !</td>
+        </tr>
+      </tbody>
+    </table>
+
+<br>
 <h3>Command Structure</h3>
     <p>A command in a Discord bot is a function that executes a specific task when triggered by a user command. Here's what each part of a command does:</p>
     <ul>
@@ -331,6 +412,58 @@ async def ping(ctx):
         <li><strong>Embed Color:</strong> Change the color to match your bot's theme using <code>discord.Color.&lt;color_name&gt;()</code> or a hex code.</li>
         <li><strong>Delete Time:</strong> Adjust or remove the <code>delete_after</code> parameter based on your needs.</li>
     </ul>
+    <h3>🎨 Message Customization System (New in v3.0)</h3>
+    <p>The refactored version introduces a centralized message system through the <code>constants.py</code> file. This makes it easy to customize all bot messages, help text, and configuration without touching the main code.</p>
+    <h4>Constants File Structure</h4>
+    <p>All static data is organized in <code>constants.py</code>:</p>
+    <pre><code># Command response messages
+MESSAGES = { 
+# Error messages
+"not_in_voice": "You're not in a Voice Channel",
+"queue_empty": "The queue is empty",
+"song_not_found": "I could not find that song",
+
+    # Success messages
+    "paused": "Paused",
+    "resumed": "Resumed",
+    "song_skipped": "Song skipped",
+
+    # Status messages
+    "queued": "Queued",
+    "now_playing": "Now Playing",
+
+    # Loop messages
+    "loop_song": "🔂 Loop mode: **Song** - Current song will repeat",
+    "loop_queue": "🔁 Loop mode: **Queue** - Queue will repeat",
+    "loop_off": "▶️ Loop mode: **Off** - Normal playback"
+
+}</code></pre>
+
+<h4>Easy Customization</h4>
+<p>To customize bot messages, simply edit the values in <code>constants.py</code>:</p>
+<ul>
+<li><strong>Language Translation:</strong> Change all messages to your preferred language</li>
+<li><strong>Custom Branding:</strong> Add your server's personality to the messages</li>
+<li><strong>Emoji Customization:</strong> Change or add emojis to make messages more fun</li>
+<li><strong>Error Messages:</strong> Make error messages more helpful or friendly</li>
+</ul>
+<h4>Configuration Options</h4>
+<p>Other customizable settings in <code>constants.py</code>:</p>
+<ul>
+<li><strong>QUEUE_SONGS_PER_PAGE:</strong> Number of songs displayed per page in queue (default: 10)</li>
+<li><strong>VIEW_TIMEOUT:</strong> How long interactive buttons stay active (default: 300 seconds)</li>
+<li><strong>DEFAULT_LOOP_MODE:</strong> Starting loop mode when bot starts (default: "off")</li>
+<li><strong>LOOP_ICONS:</strong> Emojis used for different loop modes</li>
+</ul>
+<h4>Advanced Customization</h4>
+<p>For developers who want to add new features:</p>
+<ul>
+<li><strong>Add New Messages:</strong> Simply add new keys to the MESSAGES dictionary</li>
+<li><strong>Create New Categories:</strong> Add new command categories to the help system</li>
+<li><strong>Modify Embed Styles:</strong> Change colors and formatting by editing the embed creation methods in <code>music_bot.py</code></li>
+</ul>
+<p><strong>💡 Pro Tip:</strong> After making changes to <code>constants.py</code>, restart the bot to see your customizations take effect!</p>
+
   </div>
   <hr>
   <div align="center">

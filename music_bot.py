@@ -160,7 +160,7 @@ class QueuePaginator(discord.ui.View):
         total_songs = len(self.music_bot.queue)
 
         embed = discord.Embed(
-            title=f"📋 Queue - Page {self.current_page}/{total_pages}",
+            title=f"Queue - Page {self.current_page}/{total_pages}",
             color=discord.Color.blue()
         )
 
@@ -169,7 +169,7 @@ class QueuePaginator(discord.ui.View):
             return embed
 
         # Add queue info
-        embed.description = f"🎵 {total_songs} song(s) total"
+        embed.description = f"{total_songs} song(s) total"
 
         # Calculate start and end indices for current page
         start_idx = (self.current_page - 1) * self.songs_per_page
@@ -185,10 +185,10 @@ class QueuePaginator(discord.ui.View):
             # Format song entry
             if i == 0 and self.music_bot.voice_client and self.music_bot.voice_client.is_playing():
                 field_name = f"🎵 **Now Playing** - {title}"
-                field_value = f"👤 Requested by: {requester}"
+                field_value = f"Requested by: {requester}\n"
             else:
                 field_name = f"{i + 1}. {title}"
-                field_value = f"👤 Requested by: {requester}"
+                field_value = f"Requested by: {requester}\n"
 
             embed.add_field(name=field_name, value=field_value, inline=False)
 

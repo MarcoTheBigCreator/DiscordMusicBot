@@ -318,7 +318,7 @@ class MusicCommands(commands.Cog):
             self.music_bot.is_playing = False  # Reset state before stopping
             self.music_bot.voice_client.stop()
 
-        jumped_song = self.music_bot.queue[0][0]['title']
+        jumped_song = self.music_bot.queue[1][0]['title']
         embed = self.music_bot.create_success_embed(
             "jumped_to", jumped_song)
         await ctx.send(embed=embed)

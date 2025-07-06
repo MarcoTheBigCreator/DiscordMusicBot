@@ -303,13 +303,30 @@ class MusicBot:
             return False
 
     def search_youtube(self, query: str) -> Optional[Dict]:
-        """Search YouTube for a song"""
+        """Search YouTube for a song or playlist"""
         try:
             with YoutubeDL(self.ydl_options) as ydl:
                 # Check if query is a URL
                 if query.startswith(('http://', 'https://', 'www.')):
                     info = ydl.extract_info(query, download=False)
-                    return {'source': info['url'], 'title': info['title']}
+
+                    # Handle playlist
+                    if 'entries' in info and len(info['entries']) > 1:
+                        return {
+                            'is_playlist': True,
+                            'playlist_title': info.get('title', 'Unknown Playlist'),
+                            'entries': [
+                                {'source': entry['url'],
+                                    'title': entry['title']}
+                                for entry in info['entries'] if entry
+                            ]
+                        }
+                    # Handle single video
+                    elif 'entries' in info and len(info['entries']) == 1:
+                        entry = info['entries'][0]
+                        return {'source': entry['url'], 'title': entry['title']}
+                    else:
+                        return {'source': info['url'], 'title': info['title']}
                 else:
                     # Search query
                     info = ydl.extract_info(
@@ -365,6 +382,9 @@ class MusicBot:
             song_url = self.queue[0][0]['source']
             if self.voice_client and self.voice_client.is_connected():
                 try:
+                    if self.voice_client.is_playing():
+                        self.voice_client.stop()
+
                     audio_source = discord.FFmpegPCMAudio(
                         song_url, **self.ffmpeg_options)
                     self.voice_client.play(
@@ -395,7 +415,11 @@ class MusicBot:
             if not self.voice_client or not self.voice_client.is_connected():
                 self.voice_client = await self.queue[0][1].connect()
             else:
-                await self.voice_client.move_to(self.queue[0][1])
+                if self.voice_client.channel != self.queue[0][1]:
+                    await self.voice_client.move_to(self.queue[0][1])
+
+            if self.voice_client.is_playing():
+                self.voice_client.stop()
 
             audio_source = discord.FFmpegPCMAudio(
                 song_url, **self.ffmpeg_options)

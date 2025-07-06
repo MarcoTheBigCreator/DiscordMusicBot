@@ -39,7 +39,7 @@ HELP_CATEGORIES = {
 # Command definitions for help system
 COMMAND_CATEGORIES = {
     "music": [
-        ("play", "p", "Add song to queue", "earfquake"),
+        ("play", "p", "Add song/playlist to queue", "play earthgang up"),
         ("skip", "s", "Skip current song", "skip"),
         ("pause", "pa", "Pause playback", "pause"),
         ("resume", "re", "Resume playback", "resume"),
@@ -114,6 +114,13 @@ MESSAGES = {
     "song_moved": "Moved '{}' from position {} to {}",
     "jumped_to": "Jumped to: {}",
 
+    # Playlist messages
+    "playlist_loading": "🎵 Loading playlist...",
+    "playlist_added": "📋 Added {} songs from playlist",
+    "playlist_title": "Playlist: {}",
+    "playlist_partial": "⚠️ Loaded {} of {} songs (some may be unavailable)",
+    "playlist_limit": "📋 Playlist limited to {} songs (max allowed)",
+
     # Status messages
     "queued": "Queued",
     "now_playing": "Now Playing",
@@ -135,7 +142,9 @@ MESSAGES = {
 # YouTube-DL options
 YDL_OPTIONS = {
     'format': 'm4a/bestaudio/best',
-    'noplaylist': True
+    'noplaylist': False,
+    'extract_flat': False,
+    'ignoreerrors': True
 }
 
 FFMPEG_OPTIONS = {

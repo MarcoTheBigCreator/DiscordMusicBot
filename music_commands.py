@@ -10,7 +10,7 @@ from discord.ext import commands
 from yt_dlp import YoutubeDL
 
 from music_bot import MusicBot
-from constants import MESSAGES
+from constants import MESSAGES, LOOP_ICONS, LOOP_ICONS
 
 
 class MusicCommands(commands.Cog):
@@ -39,34 +39,86 @@ class MusicCommands(commands.Cog):
             await ctx.send(embed=embed, delete_after=15)
             return
 
-        # Search for song
-        song = self.music_bot.search_youtube(query)
-        if not song:
+        # Send loading message for potential playlists
+        loading_msg = None
+        if query.startswith(('http://', 'https://', 'www.')) and ('playlist' in query or 'list=' in query):
+            embed = self.music_bot.create_info_embed("playlist_loading")
+            loading_msg = await ctx.send(embed=embed)
+
+        # Search for song/playlist
+        result = self.music_bot.search_youtube(query)
+        if not result:
+            if loading_msg:
+                await loading_msg.delete()
             embed = self.music_bot.create_error_embed("song_not_found")
             await ctx.send(embed=embed, delete_after=15)
             return
 
-        # Add to queue
-        song_entry = [song, ctx.author.voice.channel, ctx.channel, ctx.author]
-        self.music_bot.queue.append(song_entry)
+        # Handle playlist
+        if result.get('is_playlist', False):
+            if loading_msg:
+                await loading_msg.delete()
 
-        # Send confirmation
-        if self.music_bot.is_playing:
-            # Song is being added to queue
-            embed = self.music_bot.create_success_embed("queued")
-            embed.add_field(name=MESSAGES["song_field"],
-                            value=song['title'], inline=False)
-            embed.add_field(name=MESSAGES["by_field"],
-                            value=ctx.author.mention, inline=False)
-            await ctx.send(embed=embed)
+            entries = result['entries']
+            playlist_title = result['playlist_title']
+
+            # Add all songs to queue
+            added_count = 0
+            for entry in entries:
+                if entry:  # Skip None entries
+                    song_entry = [entry, ctx.author.voice.channel,
+                                  ctx.channel, ctx.author]
+                    self.music_bot.queue.append(song_entry)
+                    added_count += 1
+
+            # Send detailed confirmation with preview
+            if added_count > 0:
+                embed = self.music_bot.create_success_embed(
+                    "playlist_added", added_count)
+                embed.add_field(name=MESSAGES["playlist_title"].format(playlist_title),
+                                value=f"📋 **{added_count}** songs added to queue", inline=False)
+                embed.add_field(name=MESSAGES["by_field"],
+                                value=ctx.author.mention, inline=False)
+
+                # Add first few songs preview
+                preview_songs = []
+                for i, entry in enumerate(entries[:3]):  # Show first 3
+                    if entry:
+                        preview_songs.append(f"{i+1}. {entry['title']}")
+
+                if preview_songs:
+                    embed.add_field(
+                        name="🎵 Preview",
+                        value="\n".join(
+                            preview_songs) + (f"\n... and {added_count - 3} more" if added_count > 3 else ""),
+                        inline=False
+                    )
+
+                await ctx.send(embed=embed)
+
+                # Start playing if not already playing
+                if not self.music_bot.is_playing:
+                    await self.music_bot.start_playing()
+            else:
+                embed = self.music_bot.create_error_embed("song_not_found")
+                await ctx.send(embed=embed, delete_after=15)
         else:
-            # Starting to play immediately
-            await self.music_bot.start_playing()
-            # No need to send message here - start_playing will send "Now Playing" message
+            if loading_msg:
+                await loading_msg.delete()
 
-        # Ensure voice client is resumed after starting playback
-        if ctx.voice_client:
-            ctx.voice_client.resume()
+            song_entry = [result, ctx.author.voice.channel,
+                          ctx.channel, ctx.author]
+            self.music_bot.queue.append(song_entry)
+
+            if self.music_bot.is_playing:
+                embed = self.music_bot.create_success_embed("queued")
+                embed.add_field(name=MESSAGES["song_field"],
+                                value=result['title'], inline=False)
+                embed.add_field(name=MESSAGES["by_field"],
+                                value=ctx.author.mention, inline=False)
+                await ctx.send(embed=embed)
+            else:
+                await self.music_bot.start_playing()
 
     @commands.command(name='queue', aliases=['q', 'QUEUE', 'Queue', 'Q'])
     async def queue(self, ctx, page: int = 1):

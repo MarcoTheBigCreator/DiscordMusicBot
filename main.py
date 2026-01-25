@@ -5,6 +5,7 @@ Main application file - now with clean architecture
 
 import asyncio
 import io
+import logging
 import os
 import sys
 
@@ -17,6 +18,21 @@ from music_commands import setup as setup_commands
 
 # Setup encoding for Windows
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+# Setup logging - simple console output for production
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)-8s | %(message)s',
+    datefmt='%H:%M:%S',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+
+# Reduce noise from libraries
+logging.getLogger('discord').setLevel(logging.WARNING)
+logging.getLogger('yt_dlp').setLevel(logging.ERROR)
+logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+logger = logging.getLogger('MusicBot')
 
 # Load environment variables
 load_dotenv()

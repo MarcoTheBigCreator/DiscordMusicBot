@@ -287,8 +287,7 @@ class MusicCommands(commands.Cog):
             await ctx.send(embed=embed, delete_after=15)
             return
 
-        await self.music_bot.voice_client.disconnect()
-        self.music_bot.reset_state()
+        await self.music_bot.safe_disconnect()
 
         embed = self.music_bot.create_info_embed("disconnected")
         await ctx.send(embed=embed)

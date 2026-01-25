@@ -4,6 +4,7 @@ Main MusicBot class with all functionality
 """
 
 import asyncio
+import logging
 from typing import Dict, List, Optional, Tuple
 
 import discord
@@ -15,6 +16,9 @@ from constants import (
     HELP_CATEGORIES, COMMAND_CATEGORIES, DEFAULT_LOOP_MODE, QUEUE_SONGS_PER_PAGE, VIEW_TIMEOUT,
     LOOP_ICONS, YDL_OPTIONS, FFMPEG_OPTIONS, MESSAGES
 )
+
+# Setup logger for this module
+logger = logging.getLogger('MusicBot.Core')
 
 
 class HelpPaginator(discord.ui.View):
@@ -287,21 +291,36 @@ class MusicBot:
 
     async def connect_to_voice(self, ctx) -> bool:
         """Connect to user's voice channel"""
+        target_channel = ctx.author.voice.channel
+        guild = ctx.guild
+
+        # If already connected to the right channel
+        if self.voice_client and self.voice_client.is_connected():
+            if self.voice_client.channel.id == target_channel.id:
+                return True
+            # Move to new channel
+            try:
+                await self.voice_client.move_to(target_channel)
+                return True
+            except Exception as e:
+                logger.warning(f"Failed to move channels: {e}")
+
+        # Cleanup any existing connection
+        if guild.voice_client:
+            try:
+                await guild.voice_client.disconnect(force=True)
+            except Exception:
+                pass
+
+        self.voice_client = None
+        await asyncio.sleep(1)
+
+        # Connect to voice channel
         try:
-            if self.voice_client is None or not self.voice_client.is_connected():
-                self.voice_client = await ctx.author.voice.channel.connect()
-                await asyncio.sleep(0.5)
-            elif self.voice_client.channel != ctx.author.voice.channel:
-                await self.voice_client.move_to(ctx.author.voice.channel)
-                embed = discord.Embed(
-                    description=MESSAGES["moving_channel"],
-                    color=discord.Color.blue()
-                )
-                await ctx.send(embed=embed, delete_after=15)
-                await asyncio.sleep(0.3)
+            self.voice_client = await target_channel.connect(timeout=30.0)
             return True
         except Exception as e:
-            print(f"Error connecting to voice: {e}")
+            logger.error(f"Voice connection failed: {e}")
             return False
 
     def search_youtube(self, query: str) -> Optional[Dict]:
@@ -337,16 +356,10 @@ class MusicBot:
                         entry = info['entries'][0]
                         return {'source': entry['url'], 'title': entry['title']}
                     else:
-                        print(f"No results found for: {query}")
+                        logger.warning(f"No results found for: {query}")
                         return None
         except Exception as e:
-            print(f"Error in YouTube search: {e}")
-            if "unable to extract" in str(e).lower():
-                print("YouTube extraction failed - video might be unavailable")
-            elif "network" in str(e).lower():
-                print("Network error - check internet connection")
-            elif "private" in str(e).lower() or "unavailable" in str(e).lower():
-                print("Video is private or unavailable")
+            logger.error(f"YouTube search error: {e}")
             return None
 
     async def send_now_playing(self, song_title: str):
@@ -365,7 +378,7 @@ class MusicBot:
     def play_next_song_callback(self, error):
         """Callback wrapper for play_next_song that handles errors"""
         if error:
-            print(f"Audio playback error: {error}")
+            logger.error(f"Audio playback error: {error}")
         self.play_next_song()
 
     def play_next_song(self):
@@ -403,7 +416,7 @@ class MusicBot:
                         self.bot.loop
                     )
                 except Exception as e:
-                    print(f"Error playing audio: {e}")
+                    logger.error(f"Error playing audio: {e}")
                     self.is_playing = False
             else:
                 self.is_playing = False
@@ -418,12 +431,13 @@ class MusicBot:
 
         # Ensure we have a voice connection
         if not self.voice_client or not self.voice_client.is_connected():
-            print("Error: No voice connection available when trying to start playing")
+            logger.error("No voice connection available")
             self.is_playing = False
             return
 
         self.is_playing = True
         song_url = self.queue[0][0]['source']
+        song_title = self.queue[0][0]['title']
 
         try:
             # Stop any current playback
@@ -434,17 +448,16 @@ class MusicBot:
 
             audio_source = discord.FFmpegPCMAudio(
                 song_url, **self.ffmpeg_options)
-
             self.voice_client.play(
                 audio_source, after=lambda e: self.play_next_song_callback(e))
 
-            # Send now playing message immediately
-            await self.send_now_playing(self.queue[0][0]['title'])
+            # Send now playing message
+            await self.send_now_playing(song_title)
 
         except ClientException as e:
-            print(f"ClientException in start_playing: {e}")
+            logger.error(f"Playback error: {e}")
         except Exception as e:
-            print(f"Error starting playback: {e}")
+            logger.error(f"Unexpected error: {e}")
             self.is_playing = False
 
     def reset_state(self):
@@ -453,6 +466,26 @@ class MusicBot:
         self.loop_mode = DEFAULT_LOOP_MODE
         self.queue = []
         self.voice_client = None
+
+    async def safe_disconnect(self):
+        """Safely disconnect from voice"""
+        try:
+            if self.voice_client and self.voice_client.is_playing():
+                self.voice_client.stop()
+                await asyncio.sleep(0.3)
+
+            if self.voice_client:
+                try:
+                    await self.voice_client.disconnect(force=True)
+                except Exception as e:
+                    logger.warning(f"Disconnect error: {e}")
+
+            await asyncio.sleep(0.5)
+
+        except Exception as e:
+            logger.error(f"Disconnect failed: {e}")
+        finally:
+            self.reset_state()
 
     def get_status_embed(self) -> discord.Embed:
         """Generate status embed"""

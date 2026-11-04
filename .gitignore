@@ -2,3 +2,26 @@
 .idea
 .vscode
 __pycache__
+.env.*
+!.env.template
+.venv/
+venv/
+.bootstrap/
+.verification-env/
+.verification-v4/
+.uv-cache/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+data/
+cookies*
+*.cookies.txt
+*.log
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Local implementation review; user documentation lives in README.md.
+/REVISION.md

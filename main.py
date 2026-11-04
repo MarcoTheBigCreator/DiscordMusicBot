@@ -1,148 +1,168 @@
-"""
-DISCORD MUSIC BOT CRUMMY Version 3.0 (refactored)
-Main application file - now with clean architecture
-"""
+"""Crummy v4. Import-safe entry point: uv run --locked python main.py."""
 
+import argparse
 import asyncio
-import io
 import logging
-import os
 import sys
 
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
 
-from music_bot import MusicBot
-from music_commands import setup as setup_commands
+from config import Settings, validate_prefix
+from constants import MESSAGES
+from logging_setup import configure_logging
+from media import MediaError
+from music_commands import setup
+from player import MusicBot, send
+from prefixes import Prefixes
 
-# Setup encoding for Windows
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-
-# Setup logging - simple console output for production
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s | %(levelname)-8s | %(message)s',
-    datefmt='%H:%M:%S',
-    handlers=[logging.StreamHandler(sys.stdout)]
-)
-
-# Reduce noise from libraries
-logging.getLogger('discord').setLevel(logging.WARNING)
-logging.getLogger('yt_dlp').setLevel(logging.ERROR)
-logging.getLogger('urllib3').setLevel(logging.WARNING)
-
-logger = logging.getLogger('MusicBot')
-
-# Load environment variables
-load_dotenv()
-
-# Configuration
-DISCORD_API_TOKEN = os.getenv("DISCORD_API_TOKEN")
-PREFIX = os.getenv("DISCORD_BOT_PREFIX")
-
-if not DISCORD_API_TOKEN:
-    raise ValueError("DISCORD_API_TOKEN is not set in .env file")
-if not PREFIX:
-    raise ValueError("DISCORD_BOT_PREFIX is not set in .env file")
-
-# Global state for prefix changes
-current_prefix = PREFIX
+logger = logging.getLogger(__name__)
 
 
-def get_prefix(bot, message):
-    """Dynamic prefix function"""
-    return current_prefix
+def create_bot(settings):
+    prefixes = Prefixes(settings.data_dir / "prefixes.json", settings.prefix)
+    intents = discord.Intents.none()
+    intents.guilds = True
+    intents.messages = True
+    intents.voice_states = True
+    intents.message_content = True
 
+    def prefix(bot, message):
+        return prefixes.get(message.guild.id if message.guild else None)
 
-# Bot setup
-bot = commands.Bot(
-    command_prefix=get_prefix,
-    intents=discord.Intents.all(),
-    help_command=None  # Disable default help command
-)
+    class Crummy(commands.Bot):
+        async def setup_hook(self):
+            await setup(self, self.music)
 
-# Initialize music bot
-music_bot = MusicBot(bot)
+        async def close(self):
+            await self.music.close()
+            await super().close()
 
-
-@bot.event
-async def on_ready():
-    """Bot ready event"""
-    # Set status once when bot starts
-    await bot.change_presence(
-        activity=discord.Activity(
-            type=discord.ActivityType.listening,
-            name="Music"
-        )
+    bot = Crummy(
+        command_prefix=prefix,
+        intents=intents,
+        help_command=None,
+        case_insensitive=True,
+        allowed_mentions=discord.AllowedMentions.none(),
     )
-    print('Bot is online')
-    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
-    print('------')
-    sys.stdout.flush()
+    bot.music = MusicBot(bot, settings)
 
-
-@bot.command(name='ping', aliases=['PING'])
-async def ping(ctx):
-    """Ping command"""
-    latency = round(bot.latency * 1000)
-    embed = discord.Embed(
-        title="Pong! 🏓",
-        description=f'{latency} ms',
-        color=discord.Color.red()
-    )
-    await ctx.send(embed=embed, delete_after=60)
-
-
-@bot.command(name='prefix', aliases=['pre', 'Prefix', 'PREFIX', 'Pre', 'PRE'])
-async def change_prefix(ctx, new_prefix):
-    """Change bot prefix command"""
-    global current_prefix
-    current_prefix = new_prefix
-
-    # Update .env file
-    try:
-        with open('.env', 'r') as file:
-            data = file.readlines()
-
-        with open('.env', 'w') as file:
-            for line in data:
-                if line.startswith("DISCORD_BOT_PREFIX"):
-                    file.write(f"DISCORD_BOT_PREFIX={new_prefix}\n")
-                else:
-                    file.write(line)
-
-        embed = discord.Embed(
-            description=f"Prefix changed to: `{new_prefix}`",
-            color=discord.Color.green()
+    @bot.event
+    async def on_ready():
+        await bot.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.listening, name="Music")
         )
-        await ctx.send(embed=embed, delete_after=90)
-    except Exception as e:
-        print(f"Error updating prefix: {e}")
-        embed = discord.Embed(
-            description="Failed to update prefix",
-            color=discord.Color.red()
+        print("Bot is online")
+        print(f"Logged in as {bot.user} (ID: {bot.user.id})")
+        print("------", flush=True)
+
+    @bot.event
+    async def on_voice_state_update(member, before, after):
+        if bot.user and member.id == bot.user.id and after.channel is None:
+            session = bot.music.sessions.get(member.guild.id)
+            if session:
+                await session.safe_disconnect()
+
+    @bot.event
+    async def on_guild_remove(guild):
+        session = bot.music.sessions.pop(guild.id, None)
+        if session:
+            await session.safe_disconnect()
+
+    @bot.event
+    async def on_command_error(ctx, error):
+        error = getattr(error, "original", error)
+        if isinstance(error, commands.CommandNotFound):
+            return
+        if isinstance(error, MediaError):
+            text = MESSAGES.get(error.code, MESSAGES["extraction_failed"])
+        elif isinstance(error, commands.NoPrivateMessage):
+            text = MESSAGES["guild_only"]
+        elif isinstance(error, commands.MissingPermissions):
+            text = MESSAGES["missing_permissions"]
+        elif isinstance(error, commands.UserInputError):
+            text = MESSAGES["invalid_arguments"].format(prefix=ctx.prefix)
+        else:
+            logger.error(
+                "guild=%s operation=command error_type=%s",
+                getattr(ctx.guild, "id", None),
+                type(error).__name__,
+            )
+            text = MESSAGES["extraction_failed"]
+        await send(
+            ctx, embed=discord.Embed(description=text, color=discord.Color.red()), delete_after=30
         )
-        await ctx.send(embed=embed, delete_after=15)
+
+    @bot.command(name="ping")
+    async def ping(ctx):
+        await send(
+            ctx,
+            embed=discord.Embed(
+                title=MESSAGES["pong"],
+                description=f"{round(bot.latency * 1000)} ms",
+                color=discord.Color.red(),
+            ),
+            delete_after=60,
+        )
+
+    @bot.command(name="prefix", aliases=["pre"])
+    @commands.guild_only()
+    @commands.has_guild_permissions(manage_guild=True)
+    async def change_prefix(ctx, new_prefix: str):
+        try:
+            validate_prefix(new_prefix)
+        except ValueError:
+            raise commands.BadArgument() from None
+        try:
+            await prefixes.set(ctx.guild.id, new_prefix)
+        except OSError:
+            await send(
+                ctx,
+                embed=discord.Embed(
+                    description=MESSAGES["prefix_failed"], color=discord.Color.red()
+                ),
+            )
+            return
+        await send(
+            ctx,
+            embed=discord.Embed(
+                description=MESSAGES["prefix_changed"].format(new_prefix),
+                color=discord.Color.green(),
+            ),
+            delete_after=90,
+        )
+
+    return bot
 
 
 async def main():
-    """Main function to start the bot"""
+    settings = Settings.load()
+    bot = create_bot(settings)
     print("Starting bot...")
     async with bot:
-        # Load music commands
         print("Loading music commands...")
-        await setup_commands(bot, music_bot)
-
-        # Start the bot
         print("Connecting to Discord...")
-        await bot.start(DISCORD_API_TOKEN)
+        await bot.start(settings.token)
 
 
-if __name__ == "__main__":
+def run():
+    parser = argparse.ArgumentParser(description="Crummy Discord music bot")
+    parser.add_argument("--version", action="version", version="Crummy 4.0.0")
+    parser.parse_args()
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    configure_logging()
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Bot stopped by user")
-    except Exception as e:
-        print(f"Error running bot: {e}")
+    except Exception as exc:
+        if isinstance(exc, ValueError):
+            print(str(exc), file=sys.stderr)
+        else:
+            logger.error("operation=startup error_type=%s", type(exc).__name__)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    run()

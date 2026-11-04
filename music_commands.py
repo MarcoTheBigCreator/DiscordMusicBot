@@ -22,6 +22,9 @@ class MusicCommands(commands.Cog):
     def session(self, ctx):
         return self.music_bot.session(ctx.guild.id)
 
+    async def send(self, ctx, **kwargs):
+        return await send(ctx, settings=self.music_bot.settings, **kwargs)
+
     async def cog_check(self, ctx):
         if ctx.guild is None:
             raise commands.NoPrivateMessage()
@@ -45,7 +48,7 @@ class MusicCommands(commands.Cog):
         if query.startswith(("http://", "https://", "www.")) and (
             "playlist" in query or "list=" in query
         ):
-            loading = await send(ctx, embed=session.create_info_embed("playlist_loading"))
+            loading = await self.send(ctx, embed=session.create_info_embed("playlist_loading"))
             try:
                 await request
             finally:
@@ -68,7 +71,7 @@ class MusicCommands(commands.Cog):
     @commands.command(name="queue", aliases=["q"])
     async def queue(self, ctx, page: int = 1):
         view = QueuePaginator(self.session(ctx), page)
-        view.message = await send(ctx, embed=view.get_queue_embed(), view=view)
+        view.message = await self.send(ctx, embed=view.get_queue_embed(), view=view)
 
     @commands.command(name="skip", aliases=["s"])
     async def skip(self, ctx):
@@ -77,8 +80,9 @@ class MusicCommands(commands.Cog):
             raise MediaError("queue_empty")
         removed = session.skip()
         embed = session.create_success_embed("song_skipped")
+        embed.title = embed.description
         embed.description = removed.title
-        await send(ctx, embed=embed, delete_after=120)
+        await self.send(ctx, embed=embed)
 
     @commands.command(name="pause", aliases=["pa"])
     async def pause(self, ctx):
@@ -90,21 +94,22 @@ class MusicCommands(commands.Cog):
         session.state = State.PAUSED
         with log_context(session.guild_label):
             event(logger, "Playback paused", operation="pause", state=session.state.value)
-        await send(ctx, embed=session.create_info_embed("paused"))
+        await self.send(ctx, embed=session.create_info_embed("paused"))
 
     @commands.command(name="resume", aliases=["unpause", "re", "un"])
     async def resume(self, ctx):
         session = self.session(ctx)
         if not session.current or session.state != State.PAUSED:
             raise MediaError("nothing_to_resume")
-        if session.voice_client and session.voice_client.is_paused():
-            session.voice_client.resume()
-            session.state = State.PLAYING
-        else:
-            session.state = State.PREPARING
+        if not session.retry_playback():
+            if session.voice_client and session.voice_client.is_paused():
+                session.voice_client.resume()
+                session.state = State.PLAYING
+            else:
+                session.state = State.PREPARING
         with log_context(session.guild_label):
             event(logger, "Playback resumed", operation="resume", state=session.state.value)
-        await send(ctx, embed=session.create_info_embed("resumed"), delete_after=30)
+        await self.send(ctx, embed=session.create_info_embed("resumed"))
 
     @commands.command(name="nowplaying", aliases=["np"])
     async def nowplaying(self, ctx):
@@ -113,7 +118,7 @@ class MusicCommands(commands.Cog):
             raise MediaError("nothing_playing")
         embed = session.create_info_embed("now_playing")
         embed.description = session.current.title
-        await send(ctx, embed=embed, delete_after=120)
+        await self.send(ctx, embed=embed)
 
     @commands.command(name="loop", aliases=["l"])
     async def loop_command(self, ctx):
@@ -121,41 +126,37 @@ class MusicCommands(commands.Cog):
         session.loop_mode = {"off": "song", "song": "queue", "queue": "off"}[session.loop_mode]
         with log_context(session.guild_label):
             event(logger, "Loop mode changed", operation="loop", loop=session.loop_mode)
-        await send(
-            ctx, embed=session.create_info_embed("loop_" + session.loop_mode), delete_after=60
-        )
+        await self.send(ctx, embed=session.create_info_embed("loop_" + session.loop_mode))
 
     @commands.command(name="clear", aliases=["c"])
     async def clear_queue(self, ctx):
         session = self.session(ctx)
         count = len(session.queue)
         await session.clear()
-        await send(ctx, embed=session.create_success_embed("queue_cleared", count), delete_after=60)
+        await self.send(ctx, embed=session.create_success_embed("queue_cleared", count))
 
     @commands.command(name="leave")
     async def leave(self, ctx):
         session = self.session(ctx)
         await session.safe_disconnect()
-        await send(ctx, embed=session.create_info_embed("disconnected"))
+        await self.send(ctx, embed=session.create_info_embed("disconnected"))
 
     @commands.command(name="status", aliases=["info"])
     async def status_command(self, ctx):
-        await send(ctx, embed=self.session(ctx).get_status_embed(), delete_after=120)
+        await self.send(ctx, embed=self.session(ctx).get_status_embed())
 
     @commands.command(name="shuffle", aliases=["sh"])
     async def shuffle_queue(self, ctx):
         session = self.session(ctx)
         if len(session.pending) < 2:
-            await send(
-                ctx, embed=session.create_error_embed("need_more_songs", "shuffle"), delete_after=15
-            )
+            await self.send(ctx, embed=session.create_error_embed("need_more_songs", "shuffle"))
             return
         session.shuffle()
         embed = session.create_success_embed("queue_shuffled", len(session.pending))
         embed.add_field(
             name=MESSAGES["shuffle_title"], value=MESSAGES["shuffle_pending"], inline=False
         )
-        await send(ctx, embed=embed)
+        await self.send(ctx, embed=embed)
 
     @commands.command(name="remove", aliases=["r"])
     async def remove(self, ctx, index: int):
@@ -168,9 +169,9 @@ class MusicCommands(commands.Cog):
                 embed.add_field(
                     name=MESSAGES["next_up"], value=session.queue[0].title, inline=False
                 )
-            await send(ctx, embed=embed, delete_after=120)
+            await self.send(ctx, embed=embed)
         else:
-            await send(
+            await self.send(
                 ctx, embed=session.create_success_embed("song_removed_format", removed.title)
             )
 
@@ -178,22 +179,21 @@ class MusicCommands(commands.Cog):
     async def jump(self, ctx, index: int):
         session = self.session(ctx)
         target = session.jump(index)
-        await send(ctx, embed=session.create_success_embed("jumped_to", target.title))
+        await self.send(ctx, embed=session.create_success_embed("jumped_to", target.title))
 
     @commands.command(name="move", aliases=["mv"])
     async def move_song(self, ctx, from_index: int, to_index: int):
         session = self.session(ctx)
         entry = session.move(from_index, to_index)
-        await send(
+        await self.send(
             ctx,
             embed=session.create_success_embed("song_moved", entry.title, from_index, to_index),
-            delete_after=60,
         )
 
     @commands.command(name="help", aliases=["h"])
     async def help_command(self, ctx):
         view = HelpPaginator(self.bot, ctx.prefix)
-        view.message = await send(ctx, embed=view.get_help_embed(), view=view)
+        view.message = await self.send(ctx, embed=view.get_help_embed(), view=view)
 
 
 async def setup(bot, music_bot):

@@ -152,6 +152,7 @@ def configured_environment(monkeypatch):
         "CONNECT_TIMEOUT",
         "STREAM_MAX_AGE",
         "CRUMMY_CONNECT_TIMEOUT",
+        "MESSAGE_TTL_SECONDS",
     ):
         monkeypatch.delenv(name, raising=False)
     for name in (
@@ -220,6 +221,21 @@ def test_environment_limits_are_optional(monkeypatch):
         settings.pending_global,
         settings.pending_guild,
     ) == (3, 2, 12, 3)
+
+
+@pytest.mark.parametrize("value,expected", [("", None), ("0", None), ("120", 120.0), ("0.5", 0.5)])
+def test_optional_message_duration(monkeypatch, value, expected):
+    configured_environment(monkeypatch)
+    monkeypatch.setenv("MESSAGE_TTL_SECONDS", value)
+    assert Settings.load().message_ttl == expected
+
+
+@pytest.mark.parametrize("value", ["-1", "nan", "inf", "not-a-number"])
+def test_invalid_message_duration(monkeypatch, value):
+    configured_environment(monkeypatch)
+    monkeypatch.setenv("MESSAGE_TTL_SECONDS", value)
+    with pytest.raises(ValueError, match="MESSAGE_TTL_SECONDS"):
+        Settings.load()
 
 
 def test_cookie_mode_reports_missing_solver_before_network(monkeypatch, tmp_path):

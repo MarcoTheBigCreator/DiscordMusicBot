@@ -91,6 +91,7 @@ MESSAGES = {
     "connection_failed": "Failed to connect to voice channel",
     "nothing_to_pause": "Nothing is playing to pause",
     "nothing_to_resume": "Nothing is paused to resume",
+    "playback_held": "Playback paused after an audio access error. Your queue is preserved. Use resume to retry this track or skip to try the next one.",
     "queue_already_empty": "The queue is already empty",
     "same_position": "Source and destination are the same",
     "song_removed_format": "Removed {}",

@@ -22,9 +22,11 @@ from views import fit_embed
 logger = logging.getLogger(__name__)
 
 
-async def send(channel, **kwargs):
+async def send(channel, *, settings=None, **kwargs):
     """Discord notification failure cannot stop successful audio."""
     try:
+        if settings is not None and settings.message_ttl is not None:
+            kwargs.setdefault("delete_after", settings.message_ttl)
         if kwargs.get("embed"):
             kwargs["embed"] = fit_embed(kwargs["embed"])
         return await channel.send(**kwargs)
@@ -115,8 +117,12 @@ class Session:
         self.ticket = 0
         self.driver = None
         self.audio_source = None
+        self.playback_blocked = False
         self.drivers = set()
         self.guild_label = str(guild_id)
+
+    async def send(self, channel, **kwargs):
+        return await send(channel, settings=self.settings, **kwargs)
 
     @property
     def queue(self):
@@ -278,11 +284,11 @@ class Session:
                                     value=ctx.author.mention,
                                     inline=False,
                                 )
-                                await send(ctx, embed=embed)
+                                await self.send(ctx, embed=embed)
                         elif event["type"] == "done":
                             failed = event["failed"]
                             if event["limited"]:
-                                await send(
+                                await self.send(
                                     ctx,
                                     embed=self.create_info_embed(
                                         "playlist_limit", self.settings.playlist_limit
@@ -322,7 +328,7 @@ class Session:
                             name="⚠️",
                             value=MESSAGES["playlist_partial"].format(count, count + failed),
                         )
-                    await send(ctx, embed=embed)
+                    await self.send(ctx, embed=embed)
         except MediaError as exc:
             log_event(
                 logger,
@@ -335,7 +341,7 @@ class Session:
                 added=count,
             )
             if generation == self.generation:
-                await send(ctx, embed=self.create_error_embed(exc.code), delete_after=30)
+                await self.send(ctx, embed=self.create_error_embed(exc.code))
         except Exception as exc:
             log_event(
                 logger,
@@ -345,9 +351,11 @@ class Session:
                 error_type=type(exc).__name__,
             )
             if generation == self.generation:
-                await send(ctx, embed=self.create_error_embed("extraction_failed"), delete_after=30)
+                await self.send(ctx, embed=self.create_error_embed("extraction_failed"))
 
     def start_playing(self):
+        if self.playback_blocked:
+            return
         if self.current or not self.pending or not self.active_voice():
             return
         if self.driver and not self.driver.done():
@@ -373,6 +381,54 @@ class Session:
         with log_context(self.guild_label, entry.request_id):
             await self._play_entry(entry)
 
+    async def _open_entry_audio(self, entry):
+        async def attempt():
+            waiting = time.monotonic()
+            async with self.manager.audio_capacity:
+                started = time.monotonic()
+                source = await open_audio(entry.track, self.settings.ffmpeg)
+            log_event(
+                logger,
+                "FFmpeg produced PCM audio",
+                operation="audio",
+                worker_wait_ms=round((started - waiting) * 1000),
+                decode_ms=round((time.monotonic() - started) * 1000),
+            )
+            return source
+
+        try:
+            return await attempt()
+        except MediaError as exc:
+            if exc.code != "audio_forbidden":
+                raise
+        # Age alone does not mean a signed URL has expired. Always try the
+        # saved URL first, including queued tracks and loop repetitions.
+        log_event(
+            logger,
+            "Checking playable formats for the same video",
+            operation="audio_retry",
+            attempt=1,
+        )
+        try:
+            await self.media.refresh(entry.track, self.guild_id, verify_audio=True)
+        except MediaError as exc:
+            if exc.code == "format_unavailable":
+                # The selector exhausted its candidates after an actual 403.
+                raise MediaError("audio_forbidden", exc.diagnostics) from None
+            raise
+        return await attempt()
+
+    def retry_playback(self):
+        if not self.playback_blocked:
+            return False
+        entry, self.current = self.current, None
+        self.playback_blocked = False
+        self.state = State.IDLE
+        if entry is not None:
+            self.pending.insert(0, entry)
+        self.start_playing()
+        return True
+
     async def _play_entry(self, entry):
         self.current = entry
         started = time.monotonic()
@@ -387,23 +443,7 @@ class Session:
         ticket = self.ticket
         source = None
         try:
-            if (
-                entry.track.resolved_at is None
-                or time.monotonic() - entry.track.resolved_at > self.settings.stream_max_age
-            ):
-                log_event(logger, "Refreshing temporary audio URL", operation="refresh")
-                await self.media.refresh(entry.track, self.guild_id)
-            audio_waiting = time.monotonic()
-            async with self.manager.audio_capacity:
-                audio_started = time.monotonic()
-                source = await open_audio(entry.track, self.settings.ffmpeg)
-            log_event(
-                logger,
-                "FFmpeg produced PCM audio",
-                operation="audio",
-                worker_wait_ms=round((audio_started - audio_waiting) * 1000),
-                decode_ms=round((time.monotonic() - audio_started) * 1000),
-            )
+            source = await self._open_entry_audio(entry)
             self.audio_source = source
             loop = asyncio.get_running_loop()
             self.voice_client.play(
@@ -439,6 +479,18 @@ class Session:
             self.audio_source = None
             self.state = State.IDLE
             code = exc.code if isinstance(exc, MediaError) else "playback_failed"
+            if code in {
+                "audio_forbidden",
+                "bot_verification",
+                "rate_limited",
+                "cookies_invalid",
+                "cookies_expired",
+                "authentication_required",
+                "timeout",
+            }:
+                self.current = entry
+                self.state = State.PAUSED
+                self.playback_blocked = True
             log_event(
                 logger,
                 "Failed to start audio",
@@ -451,17 +503,25 @@ class Session:
                 else "none",
                 error_type=type(exc).__name__,
             )
-            await send(entry.channel, embed=self.create_error_embed(code), delete_after=30)
+            await self.send(entry.channel, embed=self.create_error_embed(code))
+            if self.playback_blocked:
+                log_event(
+                    logger,
+                    "Playback held; queue preserved",
+                    operation="play",
+                    state="paused",
+                    pending=len(self.pending),
+                )
+                await self.send(entry.channel, embed=self.create_info_embed("playback_held"))
             return
         # Kept separate from the playback try/except: embeds never invalidate audio.
-        await send(
+        await self.send(
             entry.channel,
             embed=discord.Embed(
                 title=MESSAGES["now_playing"],
                 description=entry.title,
                 color=discord.Color.light_gray(),
             ),
-            delete_after=120,
         )
 
     def _finished(self, ticket, error):
@@ -481,18 +541,17 @@ class Session:
         self.audio_source = None
         self.state = State.IDLE
         if not error and self.loop_mode == "song":
-            entry.track.resolved_at = None
             entry.enqueued_at = time.monotonic()
             entry.received_at = None
             self.pending.insert(0, entry)
         elif not error and self.loop_mode == "queue":
-            entry.track.resolved_at = None
             entry.enqueued_at = time.monotonic()
             entry.received_at = None
             self.pending.append(entry)
         self.start_playing()
 
     def stop_current(self):
+        self.playback_blocked = False
         self.ticket += 1
         if self.driver and not self.driver.done() and not self.driver.cancelling():
             self.driver.cancel()
@@ -567,7 +626,6 @@ class Session:
             raise MediaError("queue_empty")
         skipped = entries.pop(0)
         if self.loop_mode == "queue":
-            skipped.track.resolved_at = None
             skipped.enqueued_at = time.monotonic()
             skipped.received_at = None
             entries.append(skipped)

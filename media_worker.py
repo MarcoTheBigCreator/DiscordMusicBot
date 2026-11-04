@@ -116,6 +116,10 @@ def extract(request):
         playlistend=request["limit"],
         lazy_playlist=True,
     )
+    if request.get("verify_audio"):
+        # Recovery only: test matching formats before returning another URL.
+        # Keep the original selector and the exact same video.
+        options["check_formats"] = "selected"
     query = request["query"]
     target = query if query.startswith(("https://", "http://", "www.")) else f"ytsearch:{query}"
     # Same full extraction as the original. No flat search + second lookup and

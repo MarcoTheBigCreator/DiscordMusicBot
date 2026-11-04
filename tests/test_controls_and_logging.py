@@ -121,7 +121,7 @@ async def test_skip_only_song_in_queue_loop_restarts_once(session, ctx, monkeypa
     await cog.skip.callback(cog, ctx)
     await started(session)
     assert session.queue == [original]
-    session.media.refresh.assert_awaited_once_with(original.track, session.guild_id)
+    session.media.refresh.assert_not_awaited()
 
 
 @pytest.mark.parametrize("mode", ["off", "song", "queue"])

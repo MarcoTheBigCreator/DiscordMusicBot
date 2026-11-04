@@ -85,7 +85,7 @@ async def test_queue_operations_conserve_identity(session, operation):
 async def test_audio_start_failure_does_not_loop_or_block_next(session, monkeypatch):
     async def audio(track, executable):
         if track.title == "A":
-            raise MediaError("audio_forbidden")
+            raise MediaError("playback_failed")
         return SimpleNamespace(title=track.title, cleanup=lambda: None)
 
     monkeypatch.setattr(player, "open_audio", audio)
@@ -127,7 +127,7 @@ async def test_initial_stream_is_used_once_without_second_extraction(session):
 
 
 @pytest.mark.parametrize("now", [0.0, 10.0, 121.0, 86400.0])
-async def test_old_stream_is_refreshed_by_original_url(session, monkeypatch, now):
+async def test_old_working_stream_does_not_trigger_refresh(session, monkeypatch, now):
     # The origin of the monotonic clock is unspecified, including on fresh CI VMs.
     monkeypatch.setattr(player, "time", SimpleNamespace(monotonic=lambda: now))
     item = entry("A")
@@ -137,12 +137,14 @@ async def test_old_stream_is_refreshed_by_original_url(session, monkeypatch, now
     session.pending = [item]
     session.start_playing()
     await started(session)
-    session.media.refresh.assert_awaited_once_with(item.track, 1)
+    session.media.refresh.assert_not_awaited()
 
 
 @pytest.mark.parametrize("mode", ["song", "queue"])
 @pytest.mark.parametrize("now", [0.0, 10.0])
-async def test_natural_repeat_refreshes_even_near_clock_origin(session, monkeypatch, mode, now):
+async def test_natural_repeat_reuses_working_stream_at_any_clock_origin(
+    session, monkeypatch, mode, now
+):
     monkeypatch.setattr(player, "time", SimpleNamespace(monotonic=lambda: now))
     item = entry("A")
     item.track.resolved_at = now
@@ -156,7 +158,7 @@ async def test_natural_repeat_refreshes_even_near_clock_origin(session, monkeypa
     session.voice_client.finish()
     await started(session)
     assert session.queue == [item]
-    session.media.refresh.assert_awaited_once_with(item.track, session.guild_id)
+    session.media.refresh.assert_not_awaited()
 
 
 async def test_clear_invalidates_extraction_and_next_request_works(session, ctx):

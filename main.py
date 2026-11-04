@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 def create_bot(settings):
+    async def reply(ctx, **kwargs):
+        return await send(ctx, settings=settings, **kwargs)
+
     prefixes = Prefixes(settings.data_dir / "prefixes.json", settings.prefix)
     intents = discord.Intents.none()
     intents.guilds = True
@@ -89,20 +92,17 @@ def create_bot(settings):
                 type(error).__name__,
             )
             text = MESSAGES["extraction_failed"]
-        await send(
-            ctx, embed=discord.Embed(description=text, color=discord.Color.red()), delete_after=30
-        )
+        await reply(ctx, embed=discord.Embed(description=text, color=discord.Color.red()))
 
     @bot.command(name="ping")
     async def ping(ctx):
-        await send(
+        await reply(
             ctx,
             embed=discord.Embed(
                 title=MESSAGES["pong"],
                 description=f"{round(bot.latency * 1000)} ms",
                 color=discord.Color.red(),
             ),
-            delete_after=60,
         )
 
     @bot.command(name="prefix", aliases=["pre"])
@@ -116,20 +116,19 @@ def create_bot(settings):
         try:
             await prefixes.set(ctx.guild.id, new_prefix)
         except OSError:
-            await send(
+            await reply(
                 ctx,
                 embed=discord.Embed(
                     description=MESSAGES["prefix_failed"], color=discord.Color.red()
                 ),
             )
             return
-        await send(
+        await reply(
             ctx,
             embed=discord.Embed(
                 description=MESSAGES["prefix_changed"].format(new_prefix),
                 color=discord.Color.green(),
             ),
-            delete_after=90,
         )
 
     return bot

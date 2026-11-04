@@ -18,7 +18,7 @@ class Track:
     title: str
     original_url: str
     source: str = field(repr=False)
-    # None explicitly invalidates a stream; zero can be a valid clock reading.
+    # Extraction timestamp; playback tries the saved URL regardless of its age.
     resolved_at: float | None = field(default_factory=time.monotonic)
 
 

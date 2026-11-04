@@ -37,7 +37,9 @@ class Settings:
     queue_limit: int = 200
     extraction_timeout: float = 60
     connect_timeout: float = 30
+    # Legacy option accepted for existing .env files; URLs are retried on failure.
     stream_max_age: float = 120
+    message_ttl: float | None = None
 
     def __post_init__(self):
         validate_prefix(self.prefix)
@@ -60,6 +62,18 @@ class Settings:
                 raise ValueError(f"{name} must be a positive integer.")
         if self.stream_max_age < 0 or not math.isfinite(self.stream_max_age):
             raise ValueError("stream_max_age must be finite and nonnegative.")
+        if self.message_ttl is not None:
+            if (
+                isinstance(self.message_ttl, bool)
+                or not isinstance(self.message_ttl, (int, float))
+                or not math.isfinite(self.message_ttl)
+                or self.message_ttl < 0
+            ):
+                raise ValueError(
+                    "MESSAGE_TTL_SECONDS must be finite and nonnegative; leave empty or use 0 to keep messages."
+                )
+            if self.message_ttl == 0:
+                object.__setattr__(self, "message_ttl", None)
 
     @classmethod
     def load(cls):
@@ -67,6 +81,13 @@ class Settings:
 
         load_dotenv(ROOT / ".env")
         data_dir = Path(os.getenv("CRUMMY_DATA_DIR", str(ROOT / "data"))).expanduser()
+        message_ttl = os.getenv("MESSAGE_TTL_SECONDS", "").strip()
+        try:
+            message_ttl = float(message_ttl) if message_ttl else None
+        except ValueError:
+            raise ValueError(
+                "MESSAGE_TTL_SECONDS must be a duration in seconds, or empty to keep messages."
+            ) from None
         limits = {}
         for field_name, variable, alias, parser in (
             ("workers", "WORKERS", "CRUMMY_EXTRACT_WORKERS", int),
@@ -93,6 +114,7 @@ class Settings:
             cookies=os.getenv("YTDLP_COOKIES_FILE", "").strip(),
             ffmpeg=os.getenv("FFMPEG_EXECUTABLE", "ffmpeg"),
             data_dir=data_dir if data_dir.is_absolute() else ROOT / data_dir,
+            message_ttl=message_ttl,
             **limits,
         )
         if not settings.token:

@@ -72,7 +72,7 @@ class Media:
         self.capacity = asyncio.Semaphore(settings.workers)
         self.guild_capacity = {}
 
-    async def extract(self, query, guild_id, *, limit=None):
+    async def extract(self, query, guild_id, *, limit=None, verify_audio=False):
         validate_query(query)
         waiting = time.monotonic()
         try:
@@ -113,6 +113,8 @@ class Media:
                             "cookies": self.settings.cookies,
                             "limit": limit or self.settings.playlist_limit,
                         }
+                        if verify_audio:
+                            request["verify_audio"] = True
                         process.stdin.write((json.dumps(request) + "\n").encode())
                         await process.stdin.drain()
                         process.stdin.close()
@@ -154,15 +156,29 @@ class Media:
         except TimeoutError as exc:
             raise MediaError("timeout") from exc
 
-    async def refresh(self, track, guild_id):
-        found = False
-        async for event in self.extract(track.original_url, guild_id, limit=1):
+    async def refresh(self, track, guild_id, *, verify_audio=False):
+        replacement = None
+        diagnostics = ()
+        options = {"verify_audio": True} if verify_audio else {}
+        async for event in self.extract(track.original_url, guild_id, limit=1, **options):
+            if event["type"] == "header":
+                diagnostics = event.get("diagnostics", ())
+                if diagnostics:
+                    log_event(
+                        logger,
+                        "Extractor session diagnostics",
+                        operation="refresh",
+                        diagnostics=",".join(
+                            MediaError("extraction_failed", diagnostics).diagnostics
+                        ),
+                    )
             if event["type"] == "track":
-                track.source = event["source"]
-                track.resolved_at = time.monotonic()
-                found = True
-        if not found:
+                replacement = event["source"]
+        if replacement is None:
             raise MediaError("unavailable")
+        # A failed/cancelled worker must not partially overwrite the old stream.
+        track.source = replacement
+        track.resolved_at = time.monotonic()
 
 
 def track_from_event(event):

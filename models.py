@@ -18,7 +18,8 @@ class Track:
     title: str
     original_url: str
     source: str = field(repr=False)
-    resolved_at: float = field(default_factory=time.monotonic)
+    # None explicitly invalidates a stream; zero can be a valid clock reading.
+    resolved_at: float | None = field(default_factory=time.monotonic)
 
 
 @dataclass

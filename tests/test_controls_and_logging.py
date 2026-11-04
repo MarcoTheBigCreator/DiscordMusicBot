@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 import pytest
@@ -105,10 +106,14 @@ async def test_shuffle_preserves_audio_pause_loop_and_entries(
     assert session.current.title == expected
 
 
-async def test_skip_only_song_in_queue_loop_restarts_once(session, ctx):
+@pytest.mark.parametrize("now", [0.0, 10.0, 86400.0])
+async def test_skip_only_song_in_queue_loop_restarts_once(session, ctx, monkeypatch, now):
+    monkeypatch.setattr("player.time", SimpleNamespace(monotonic=lambda: now))
     session.media.refresh = AsyncMock()
     session.loop_mode = "queue"
     original = entry("A")
+    original.track.resolved_at = now
+    original.enqueued_at = now
     session.pending = [original]
     session.start_playing()
     await started(session)

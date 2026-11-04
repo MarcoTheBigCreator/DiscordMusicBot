@@ -387,7 +387,10 @@ class Session:
         ticket = self.ticket
         source = None
         try:
-            if time.monotonic() - entry.track.resolved_at > self.settings.stream_max_age:
+            if (
+                entry.track.resolved_at is None
+                or time.monotonic() - entry.track.resolved_at > self.settings.stream_max_age
+            ):
                 log_event(logger, "Refreshing temporary audio URL", operation="refresh")
                 await self.media.refresh(entry.track, self.guild_id)
             audio_waiting = time.monotonic()
@@ -478,12 +481,12 @@ class Session:
         self.audio_source = None
         self.state = State.IDLE
         if not error and self.loop_mode == "song":
-            entry.track.resolved_at = 0
+            entry.track.resolved_at = None
             entry.enqueued_at = time.monotonic()
             entry.received_at = None
             self.pending.insert(0, entry)
         elif not error and self.loop_mode == "queue":
-            entry.track.resolved_at = 0
+            entry.track.resolved_at = None
             entry.enqueued_at = time.monotonic()
             entry.received_at = None
             self.pending.append(entry)
@@ -564,7 +567,7 @@ class Session:
             raise MediaError("queue_empty")
         skipped = entries.pop(0)
         if self.loop_mode == "queue":
-            skipped.track.resolved_at = 0
+            skipped.track.resolved_at = None
             skipped.enqueued_at = time.monotonic()
             skipped.received_at = None
             entries.append(skipped)

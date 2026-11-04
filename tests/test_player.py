@@ -126,14 +126,37 @@ async def test_initial_stream_is_used_once_without_second_extraction(session):
     session.media.refresh.assert_not_awaited()
 
 
-async def test_old_stream_is_refreshed_by_original_url(session):
+@pytest.mark.parametrize("now", [0.0, 10.0, 121.0, 86400.0])
+async def test_old_stream_is_refreshed_by_original_url(session, monkeypatch, now):
+    # The origin of the monotonic clock is unspecified, including on fresh CI VMs.
+    monkeypatch.setattr(player, "time", SimpleNamespace(monotonic=lambda: now))
     item = entry("A")
-    item.track.resolved_at = 0
+    item.track.resolved_at = now - session.settings.stream_max_age - 1
+    item.enqueued_at = now
     session.media.refresh = AsyncMock()
     session.pending = [item]
     session.start_playing()
     await started(session)
     session.media.refresh.assert_awaited_once_with(item.track, 1)
+
+
+@pytest.mark.parametrize("mode", ["song", "queue"])
+@pytest.mark.parametrize("now", [0.0, 10.0])
+async def test_natural_repeat_refreshes_even_near_clock_origin(session, monkeypatch, mode, now):
+    monkeypatch.setattr(player, "time", SimpleNamespace(monotonic=lambda: now))
+    item = entry("A")
+    item.track.resolved_at = now
+    item.enqueued_at = now
+    session.media.refresh = AsyncMock()
+    session.loop_mode = mode
+    session.pending = [item]
+    session.start_playing()
+    await started(session)
+    session.media.refresh.assert_not_awaited()
+    session.voice_client.finish()
+    await started(session)
+    assert session.queue == [item]
+    session.media.refresh.assert_awaited_once_with(item.track, session.guild_id)
 
 
 async def test_clear_invalidates_extraction_and_next_request_works(session, ctx):

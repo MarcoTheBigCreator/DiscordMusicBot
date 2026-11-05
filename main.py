@@ -64,7 +64,7 @@ def create_bot(settings):
         if bot.user and member.id == bot.user.id and after.channel is None:
             session = bot.music.sessions.get(member.guild.id)
             if session:
-                await session.safe_disconnect()
+                session.voice_disconnected(member.guild)
 
     @bot.event
     async def on_guild_remove(guild):

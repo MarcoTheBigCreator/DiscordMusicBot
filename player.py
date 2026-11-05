@@ -111,6 +111,10 @@ class Session:
         self.loop_mode = DEFAULT_LOOP_MODE
         self.voice_client = None
         self.connection_lock = asyncio.Lock()
+        self.disconnect_lock = asyncio.Lock()
+        self.voice_recovery = None
+        self.now_playing_message = None
+        self.now_playing_lock = asyncio.Lock()
         self.request_lock = asyncio.Lock()
         self.requests = set()
         self.generation = 0
@@ -123,6 +127,44 @@ class Session:
 
     async def send(self, channel, **kwargs):
         return await send(channel, settings=self.settings, **kwargs)
+
+    async def _delete_now_playing(self, message):
+        try:
+            await message.delete()
+        except discord.NotFound:
+            pass  # Already removed manually or by MESSAGE_TTL_SECONDS.
+        except discord.HTTPException:
+            with log_context(self.guild_label):
+                log_event(
+                    logger,
+                    "Failed to delete previous Now Playing message",
+                    level=logging.WARNING,
+                    operation="message",
+                    error_type="DiscordHTTPError",
+                )
+
+    async def show_now_playing(self, channel, entry, ticket):
+        # Commands and automatic announcements share one message per server.
+        # Serializing also prevents concurrent -np calls leaving duplicates.
+        async with self.now_playing_lock:
+            if self.current is not entry or self.ticket != ticket:
+                return
+            message = await self.send(
+                channel,
+                embed=discord.Embed(
+                    title=MESSAGES["now_playing"],
+                    description=entry.title,
+                    color=discord.Color.light_gray(),
+                ),
+            )
+            if message is None:
+                return
+            if self.current is not entry or self.ticket != ticket:
+                await self._delete_now_playing(message)
+                return
+            previous, self.now_playing_message = self.now_playing_message, message
+            if previous is not None:
+                await self._delete_now_playing(previous)
 
     @property
     def queue(self):
@@ -145,6 +187,8 @@ class Session:
                 if self.voice_client.channel.id != target.id:
                     raise MediaError("different_channel")
                 return
+            if self.voice_recovery and not self.voice_recovery.done():
+                raise MediaError("voice_reconnecting")
             generation = self.generation
             self.stop_current()
             self.pending.clear()
@@ -515,19 +559,30 @@ class Session:
                 await self.send(entry.channel, embed=self.create_info_embed("playback_held"))
             return
         # Kept separate from the playback try/except: embeds never invalidate audio.
-        await self.send(
-            entry.channel,
-            embed=discord.Embed(
-                title=MESSAGES["now_playing"],
-                description=entry.title,
-                color=discord.Color.light_gray(),
-            ),
-        )
+        await self.show_now_playing(entry.channel, entry, ticket)
 
     def _finished(self, ticket, error):
         if ticket != self.ticket or not self.current:
             return
         entry, self.current = self.current, None
+        if not self.active_voice():
+            self.audio_source = None
+            if self.state == State.PAUSED:
+                self.current = entry
+                self.playback_blocked = True
+            else:
+                self.state = State.IDLE
+                entry.enqueued_at = time.monotonic()
+                entry.received_at = None
+                self.pending.insert(0, entry)
+            with log_context(self.guild_label, entry.request_id):
+                log_event(
+                    logger,
+                    "Audio interrupted by voice disconnect; track retained",
+                    operation="voice_recovery",
+                    pending=len(self.pending),
+                )
+            return
         with log_context(self.guild_label, entry.request_id):
             log_event(
                 logger,
@@ -588,19 +643,88 @@ class Session:
                 cancelled_requests=requests,
             )
 
-    async def safe_disconnect(self):
-        await self.clear()
-        voice, self.voice_client = self.voice_client, None
-        self.loop_mode = DEFAULT_LOOP_MODE
-        if voice:
-            try:
-                await voice.disconnect(force=True)
-                with log_context(self.guild_label):
-                    log_event(logger, "Voice disconnected", operation="disconnect", result="ok")
-            except (discord.DiscordException, OSError, TimeoutError) as exc:
-                logger.warning(
-                    "guild=%s operation=disconnect error_type=%s", self.guild_id, type(exc).__name__
+    def voice_disconnected(self, guild):
+        # A channel=None event also occurs during discord.py's own reconnect.
+        # Its public guild cache retains the same VoiceClient during recovery,
+        # and removes it when a terminal disconnect has completed.
+        if self.voice_client is None or (self.voice_recovery and not self.voice_recovery.done()):
+            return
+        self.voice_recovery = asyncio.create_task(self._wait_for_voice(guild, self.voice_client))
+
+    async def _wait_for_voice(self, guild, voice):
+        try:
+            with log_context(self.guild_label):
+                log_event(
+                    logger,
+                    "Voice connection interrupted; waiting for recovery",
+                    operation="voice_recovery",
+                    pending=len(self.pending),
                 )
+                async with asyncio.timeout(self.settings.connect_timeout):
+                    while self.voice_client is voice:
+                        # Let discord.py process the event before checking its
+                        # public connection/cache state. No private state hooks.
+                        await asyncio.sleep(0.1)
+                        if self.voice_client is not voice:
+                            return
+                        if guild.voice_client is not voice:
+                            log_event(
+                                logger,
+                                "Voice connection ended",
+                                operation="voice_recovery",
+                                result="disconnected",
+                            )
+                            break
+                        member_voice = getattr(getattr(guild, "me", None), "voice", None)
+                        if (
+                            voice.is_connected()
+                            and getattr(member_voice, "channel", None) is not None
+                        ):
+                            log_event(
+                                logger,
+                                "Voice connection recovered; queue preserved",
+                                operation="voice_recovery",
+                                result="ok",
+                                pending=len(self.pending),
+                            )
+                            self.start_playing()
+                            return
+        except TimeoutError:
+            with log_context(self.guild_label):
+                log_event(
+                    logger,
+                    "Voice recovery timed out",
+                    level=logging.WARNING,
+                    operation="voice_recovery",
+                    result="timeout",
+                )
+        finally:
+            if self.voice_recovery is asyncio.current_task():
+                self.voice_recovery = None
+        await self.safe_disconnect()
+
+    async def safe_disconnect(self):
+        async with self.disconnect_lock:
+            voice, self.voice_client = self.voice_client, None
+            recovery, self.voice_recovery = self.voice_recovery, None
+            if recovery and recovery is not asyncio.current_task():
+                recovery.cancel()
+                await asyncio.gather(recovery, return_exceptions=True)
+            self.loop_mode = DEFAULT_LOOP_MODE
+            if voice is None and not self.queue and not self.requests and not self.drivers:
+                return
+            await self.clear()
+            if voice:
+                try:
+                    await voice.disconnect(force=True)
+                    with log_context(self.guild_label):
+                        log_event(logger, "Voice disconnected", operation="disconnect", result="ok")
+                except (discord.DiscordException, OSError, TimeoutError) as exc:
+                    logger.warning(
+                        "guild=%s operation=disconnect error_type=%s",
+                        self.guild_id,
+                        type(exc).__name__,
+                    )
 
     def remove(self, index):
         entries = self.queue

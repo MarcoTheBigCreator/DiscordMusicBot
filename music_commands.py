@@ -116,9 +116,7 @@ class MusicCommands(commands.Cog):
         session = self.session(ctx)
         if not session.current:
             raise MediaError("nothing_playing")
-        embed = session.create_info_embed("now_playing")
-        embed.description = session.current.title
-        await self.send(ctx, embed=embed)
+        await session.show_now_playing(ctx, session.current, session.ticket)
 
     @commands.command(name="loop", aliases=["l"])
     async def loop_command(self, ctx):

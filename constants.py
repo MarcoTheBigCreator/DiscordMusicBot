@@ -89,6 +89,7 @@ MESSAGES = {
     "no_query": "Please provide a song to search for",
     "song_not_found": "I could not find that song",
     "connection_failed": "Failed to connect to voice channel",
+    "voice_reconnecting": "The voice connection is recovering. Please try again shortly.",
     "nothing_to_pause": "Nothing is playing to pause",
     "nothing_to_resume": "Nothing is paused to resume",
     "playback_held": "Playback paused after an audio access error. Your queue is preserved. Use resume to retry this track or skip to try the next one.",

@@ -1,0 +1,25 @@
+name: Checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.13.7"
+      - run: uv sync --locked
+      - run: uv run --locked bot --help
+      - run: uv run --locked ruff check .
+      - run: uv run --locked ruff format --check .
+      - name: Install FFmpeg (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: uv run --locked test -q
+      - name: Dependency audit (nonzero on findings or service failure)
+        run: uv run --locked pip-audit --skip-editable --progress-spinner off
